@@ -275,16 +275,10 @@ return
     | RET FALSE SEMICOLON {
 	    $$ = 0.1;
     }
-    | RET I_CONST SEMICOLON {
-	    $$ = 0.1;
-    }
-    | RET F_CONST SEMICOLON {
+    | RET initializer SEMICOLON {
 	    $$ = 0.1;
     }
     | RET expression_stat4 SEMICOLON{
-	    $$ = 0.1;
-    }
-    | RET STR_CONST SEMICOLON{
 	    $$ = 0.1;
     }
 ;
@@ -502,8 +496,8 @@ factor
         }       
         $$ = 0.3; 
     };
-    | I_CONST { $$ = 0.1; }
-    | F_CONST { $$ = 0.2; }
+    | minus I_CONST { $$ = 0.1; }
+    | minus F_CONST { $$ = 0.2; }
     | function_call { $$ = 0.1; }
 ;
 
@@ -531,12 +525,17 @@ print_func
 ;
 
 initializer
-    : I_CONST { $$ = 0.1; }
-    | F_CONST { 
+    : minus I_CONST { $$ = 0.1; }
+    | minus F_CONST { 
 	    $$ = 0.1; 
 	    float_flag = 1;
     }
     | STR_CONST { $$ = 0.1; }
+;
+   
+minus
+    : SUB
+    |
 ;
 
 /* actions can be taken when meet the token or rule */
