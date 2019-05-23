@@ -1,118 +1,120 @@
    0  $accept : program $end
 
    1  program : program stat
-   2          | program stat NEWLINE
-   3          |
+   2          |
 
-   4  fprogram : fprogram fstat
-   5           | fprogram fstat NEWLINE
-   6           |
+   3  fprogram : fprogram fstat
+   4           |
 
-   7  new_line : new_line NEWLINE
-   8           |
+   5  stat : declaration
+   6       | compound_stat
+   7       | expr_asgn
+   8       | expression_stat4 semicolon
+   9       | function_decl
+  10       | function_def
+  11       |
 
-   9  stat : declaration
-  10       | compound_stat
-  11       | expr_asgn SEMICOLON
-  12       | expression_stat4 semicolon
-  13       | function_decl
-  14       | function_def
-  15       |
+  12  fstat : fdeclaration
+  13        | compound_stat
+  14        | expr_asgn
+  15        | expression_stat4 semicolon
+  16        | direct_function_call
+  17        | print_func
+  18        |
 
-  16  fstat : fdeclaration
-  17        | compound_stat
-  18        | expr_asgn SEMICOLON
-  19        | expression_stat4 semicolon
-  20        | function_call
-  21        | print_func
-  22        |
+  19  semicolon : SEMICOLON
+  20            |
 
-  23  semicolon : SEMICOLON
-  24            |
+  21  direct_function_call : func_id LB parameter RB SEMICOLON
 
-  25  function_call : ID LB parameter RB SEMICOLON NEWLINE
+  22  function_call : func_id LB parameter RB
 
-  26  parameter : pass
-  27            | parameter COMMA pass
-  28            |
+  23  func_id : ID
 
-  29  pass : ID
-  30       | initializer
+  24  parameter : pass
+  25            | parameter COMMA pass
+  26            | expression_stat4
 
-  31  expr_asgn : ID ASGN expression_stat4
-  32            | ID ADDASGN factor
-  33            | ID SUBASGN factor
-  34            | ID MULASGN factor
-  35            | ID DIVASGN factor
-  36            | ID MODASGN factor
+  27  pass : id
+  28       | initializer
 
-  37  function_decl : type ID LB argument RB SEMICOLON NEWLINE
+  29  expr_asgn : id ASGN expression_stat4 SEMICOLON
+  30            | id ADDASGN factor SEMICOLON
+  31            | id SUBASGN factor SEMICOLON
+  32            | id MULASGN factor SEMICOLON
+  33            | id DIVASGN factor SEMICOLON
+  34            | id MODASGN factor SEMICOLONE
 
-  38  function_def : type ID LB argument RB LCB fprogram RCB
-  39               | type ID LB argument RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE
+  35  function_decl : type ID LB argument RB SEMICOLON
 
-  40  return : RET SEMICOLON
-  41         | RET TRUE SEMICOLON
-  42         | RET FALSE SEMICOLON
-  43         | RET I_CONST SEMICOLON
-  44         | RET F_CONST SEMICOLON
-  45         | RET STR_CONST SEMICOLON
+  36  function_def : type ID LB argument RB LCB fprogram RCB
+  37               | type ID LB argument RB LCB fprogram return RCB
 
-  46  nargument : type ID
-  47            | nargument COMMA type ID
-  48            |
+  38  return : RET SEMICOLON
+  39         | RET TRUE SEMICOLON
+  40         | RET FALSE SEMICOLON
+  41         | RET I_CONST SEMICOLON
+  42         | RET F_CONST SEMICOLON
+  43         | RET expression_stat4 SEMICOLON
+  44         | RET STR_CONST SEMICOLON
 
-  49  fdecl_bottom : RB SEMICOLON NEWLINE
+  45  argument : type ID
+  46           | argument COMMA type ID
+  47           |
 
-  50  argument : type ID
-  51           | argument COMMA type ID
-  52           |
+  48  declaration : type ID ASGN initializer SEMICOLON
+  49              | type ID SEMICOLON
+  50              | type ID ASGN expression_stat4 SEMICOLON
 
-  53  declaration : type ID ASGN initializer SEMICOLON NEWLINE
-  54              | type ID SEMICOLON NEWLINE
-  55              | type ID ASGN expression_stat4 SEMICOLON NEWLINE
+  51  fdeclaration : type ID SEMICOLON
+  52               | type ID ASGN initializer SEMICOLON
+  53               | type ID ASGN expression_stat4 SEMICOLON
 
-  56  fdeclaration : type ID SEMICOLON NEWLINE
-  57               | type ID ASGN initializer SEMICOLON NEWLINE
-  58               | type ID ASGN expression_stat4 SEMICOLON NEWLINE
+  54  compound_stat : if_stat
+  55                | while_stat
 
-  59  compound_stat : if_stat
-  60                | while_stat
+  56  if_stat : IF LB expression_stat4 RB LCB fprogram RCB
+  57          | IF LB expression_stat4 RB LCB fprogram RCB else_stat
+  58          | IF LB expression_stat4 RB LCB fprogram RCB elseif_stat
 
-  61  if_stat : IF LB expression_stat4 RB LCB fprogram RCB
-  62          | IF LB expression_stat4 RB LCB fprogram RCB ELSE if_stat
-  63          | IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB
+  59  else_stat : ELSE LCB fprogram RCB
 
-  64  while_stat : WHILE LB expression_stat4 RB LCB fprogram RCB
+  60  elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram RCB else_stat
+  61              | ELSE IF LB expression_stat4 RB LCB fprogram RCB elseif_stat
 
-  65  expression_stat4 : expression_stat4 EQ expression_stat3
-  66                   | expression_stat4 MTE expression_stat3
-  67                   | expression_stat4 LTE expression_stat3
-  68                   | expression_stat4 NE expression_stat3
-  69                   | expression_stat4 MT expression_stat3
-  70                   | expression_stat4 LT expression_stat3
-  71                   | expression_stat3
+  62  while_stat : WHILE LB expression_stat4 RB LCB fprogram RCB
 
-  72  expression_stat3 : expression_stat3 ADD expression_stat2
-  73                   | expression_stat3 SUB expression_stat2
-  74                   | expression_stat2
+  63  expression_stat4 : expression_stat4 EQ expression_stat3
+  64                   | expression_stat4 MTE expression_stat3
+  65                   | expression_stat4 LTE expression_stat3
+  66                   | expression_stat4 NE expression_stat3
+  67                   | expression_stat4 MT expression_stat3
+  68                   | expression_stat4 LT expression_stat3
+  69                   | expression_stat3
 
-  75  expression_stat2 : expression_stat2 MUL expression_stat1
-  76                   | expression_stat2 DIV expression_stat1
-  77                   | expression_stat2 MOD expression_stat1
-  78                   | expression_stat1
+  70  expression_stat3 : expression_stat3 ADD expression_stat2
+  71                   | expression_stat3 SUB expression_stat2
+  72                   | expression_stat2
 
-  79  expression_stat1 : expression_stat1 INC
-  80                   | expression_stat1 DEC
-  81                   | factor
+  73  expression_stat2 : expression_stat2 MUL expression_stat1
+  74                   | expression_stat2 DIV expression_stat1
+  75                   | expression_stat2 MOD expression_stat1
+  76                   | expression_stat1
 
-  82  factor : LB expression_stat4 RB
-  83         | ID
-  84         | I_CONST
-  85         | F_CONST
+  77  expression_stat1 : expression_stat1 INC
+  78                   | expression_stat1 DEC
+  79                   | factor
 
-  86  print_func : PRINT LB ID RB SEMICOLON NEWLINE
-  87             | PRINT LB STR_CONST RB SEMICOLON NEWLINE
+  80  factor : LB expression_stat4 RB
+  81         | ID
+  82         | I_CONST
+  83         | F_CONST
+  84         | function_call
+
+  85  id : ID
+
+  86  print_func : PRINT LB ID RB SEMICOLON
+  87             | PRINT LB STR_CONST RB SEMICOLON
 
   88  initializer : I_CONST
   89              | F_CONST
@@ -126,29 +128,28 @@
 
 state 0
 	$accept : . program $end  (0)
-	program : .  (3)
+	program : .  (2)
 
-	.  reduce 3
+	.  reduce 2
 
 	program  goto 1
 
 
-1: shift/reduce conflict (shift 2, reduce 15) on IF
-1: shift/reduce conflict (shift 3, reduce 15) on WHILE
-1: shift/reduce conflict (shift 4, reduce 15) on LB
-1: shift/reduce conflict (shift 5, reduce 15) on I_CONST
-1: shift/reduce conflict (shift 6, reduce 15) on F_CONST
-1: shift/reduce conflict (shift 7, reduce 15) on BOOL
-1: shift/reduce conflict (shift 8, reduce 15) on INT
-1: shift/reduce conflict (shift 9, reduce 15) on STRING
-1: shift/reduce conflict (shift 10, reduce 15) on FLOAT
-1: shift/reduce conflict (shift 11, reduce 15) on VOID
-1: shift/reduce conflict (shift 12, reduce 15) on ID
+1: shift/reduce conflict (shift 2, reduce 11) on IF
+1: shift/reduce conflict (shift 3, reduce 11) on WHILE
+1: shift/reduce conflict (shift 4, reduce 11) on LB
+1: shift/reduce conflict (shift 5, reduce 11) on I_CONST
+1: shift/reduce conflict (shift 6, reduce 11) on F_CONST
+1: shift/reduce conflict (shift 7, reduce 11) on BOOL
+1: shift/reduce conflict (shift 8, reduce 11) on INT
+1: shift/reduce conflict (shift 9, reduce 11) on STRING
+1: shift/reduce conflict (shift 10, reduce 11) on FLOAT
+1: shift/reduce conflict (shift 11, reduce 11) on VOID
+1: shift/reduce conflict (shift 12, reduce 11) on ID
 state 1
 	$accept : program . $end  (0)
 	program : program . stat  (1)
-	program : program . stat NEWLINE  (2)
-	stat : .  (15)
+	stat : .  (11)
 
 	$end  accept
 	IF  shift 2
@@ -162,67 +163,71 @@ state 1
 	FLOAT  shift 10
 	VOID  shift 11
 	ID  shift 12
-	$end  reduce 15
-	NEWLINE  reduce 15
+	$end  reduce 11
 
 	type  goto 13
-	stat  goto 14
-	declaration  goto 15
-	compound_stat  goto 16
-	function_decl  goto 17
-	function_def  goto 18
-	if_stat  goto 19
-	while_stat  goto 20
-	expression_stat4  goto 21
-	expr_asgn  goto 22
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
+	func_id  goto 14
+	id  goto 15
+	stat  goto 16
+	declaration  goto 17
+	compound_stat  goto 18
+	function_decl  goto 19
+	function_def  goto 20
+	if_stat  goto 21
+	while_stat  goto 22
+	function_call  goto 23
+	expression_stat4  goto 24
+	expr_asgn  goto 25
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
 state 2
-	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB  (61)
-	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB ELSE if_stat  (62)
-	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB  (63)
+	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB  (56)
+	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB else_stat  (57)
+	if_stat : IF . LB expression_stat4 RB LCB fprogram RCB elseif_stat  (58)
 
-	LB  shift 27
+	LB  shift 30
 	.  error
 
 
 state 3
-	while_stat : WHILE . LB expression_stat4 RB LCB fprogram RCB  (64)
+	while_stat : WHILE . LB expression_stat4 RB LCB fprogram RCB  (62)
 
-	LB  shift 28
+	LB  shift 31
 	.  error
 
 
 state 4
-	factor : LB . expression_stat4 RB  (82)
+	factor : LB . expression_stat4 RB  (80)
 
 	LB  shift 4
 	I_CONST  shift 5
 	F_CONST  shift 6
-	ID  shift 29
+	ID  shift 32
 	.  error
 
-	expression_stat4  goto 30
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 33
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
 state 5
-	factor : I_CONST .  (84)
+	factor : I_CONST .  (82)
 
-	.  reduce 84
+	.  reduce 82
 
 
 state 6
-	factor : F_CONST .  (85)
+	factor : F_CONST .  (83)
 
-	.  reduce 85
+	.  reduce 83
 
 
 state 7
@@ -255,771 +260,194 @@ state 11
 	.  reduce 95
 
 
+12: reduce/reduce conflict (reduce 81, reduce 85) on COMMA
+12: reduce/reduce conflict (reduce 23, reduce 81) on LB
+12: reduce/reduce conflict (reduce 81, reduce 85) on RB
 state 12
-	expr_asgn : ID . ASGN expression_stat4  (31)
-	expr_asgn : ID . ADDASGN factor  (32)
-	expr_asgn : ID . SUBASGN factor  (33)
-	expr_asgn : ID . MULASGN factor  (34)
-	expr_asgn : ID . DIVASGN factor  (35)
-	expr_asgn : ID . MODASGN factor  (36)
-	factor : ID .  (83)
+	func_id : ID .  (23)
+	factor : ID .  (81)
+	id : ID .  (85)
 
-	ASGN  shift 31
-	ADDASGN  shift 32
-	SUBASGN  shift 33
-	MULASGN  shift 34
-	DIVASGN  shift 35
-	MODASGN  shift 36
-	$end  reduce 83
-	IF  reduce 83
-	SEMICOLON  reduce 83
-	NEWLINE  reduce 83
-	ADD  reduce 83
-	SUB  reduce 83
-	MUL  reduce 83
-	DIV  reduce 83
-	MOD  reduce 83
-	INC  reduce 83
-	DEC  reduce 83
-	MT  reduce 83
-	LT  reduce 83
-	MTE  reduce 83
-	LTE  reduce 83
-	EQ  reduce 83
-	NE  reduce 83
-	WHILE  reduce 83
-	LB  reduce 83
-	I_CONST  reduce 83
-	F_CONST  reduce 83
-	BOOL  reduce 83
-	INT  reduce 83
-	STRING  reduce 83
-	FLOAT  reduce 83
-	VOID  reduce 83
-	ID  reduce 83
+	$end  reduce 81
+	PRINT  reduce 81
+	IF  reduce 81
+	SEMICOLON  reduce 81
+	ADD  reduce 81
+	SUB  reduce 81
+	MUL  reduce 81
+	DIV  reduce 81
+	MOD  reduce 81
+	INC  reduce 81
+	DEC  reduce 81
+	MT  reduce 81
+	LT  reduce 81
+	MTE  reduce 81
+	LTE  reduce 81
+	EQ  reduce 81
+	NE  reduce 81
+	COMMA  reduce 81
+	WHILE  reduce 81
+	ASGN  reduce 85
+	ADDASGN  reduce 85
+	SUBASGN  reduce 85
+	MULASGN  reduce 85
+	DIVASGN  reduce 85
+	MODASGN  reduce 85
+	LB  reduce 23
+	RB  reduce 81
+	RCB  reduce 81
+	RET  reduce 81
+	I_CONST  reduce 81
+	F_CONST  reduce 81
+	BOOL  reduce 81
+	INT  reduce 81
+	STRING  reduce 81
+	FLOAT  reduce 81
+	VOID  reduce 81
+	ID  reduce 81
 
 
 state 13
-	function_decl : type . ID LB argument RB SEMICOLON NEWLINE  (37)
-	function_def : type . ID LB argument RB LCB fprogram RCB  (38)
-	function_def : type . ID LB argument RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
-	declaration : type . ID ASGN initializer SEMICOLON NEWLINE  (53)
-	declaration : type . ID SEMICOLON NEWLINE  (54)
-	declaration : type . ID ASGN expression_stat4 SEMICOLON NEWLINE  (55)
+	function_decl : type . ID LB argument RB SEMICOLON  (35)
+	function_def : type . ID LB argument RB LCB fprogram RCB  (36)
+	function_def : type . ID LB argument RB LCB fprogram return RCB  (37)
+	declaration : type . ID ASGN initializer SEMICOLON  (48)
+	declaration : type . ID SEMICOLON  (49)
+	declaration : type . ID ASGN expression_stat4 SEMICOLON  (50)
 
-	ID  shift 37
+	ID  shift 34
 	.  error
 
 
-14: shift/reduce conflict (shift 38, reduce 1) on NEWLINE
 state 14
-	program : program stat .  (1)
-	program : program stat . NEWLINE  (2)
+	function_call : func_id . LB parameter RB  (22)
 
-	NEWLINE  shift 38
-	$end  reduce 1
-	IF  reduce 1
-	WHILE  reduce 1
-	LB  reduce 1
-	I_CONST  reduce 1
-	F_CONST  reduce 1
-	BOOL  reduce 1
-	INT  reduce 1
-	STRING  reduce 1
-	FLOAT  reduce 1
-	VOID  reduce 1
-	ID  reduce 1
+	LB  shift 35
+	.  error
 
 
 state 15
-	stat : declaration .  (9)
+	expr_asgn : id . ASGN expression_stat4 SEMICOLON  (29)
+	expr_asgn : id . ADDASGN factor SEMICOLON  (30)
+	expr_asgn : id . SUBASGN factor SEMICOLON  (31)
+	expr_asgn : id . MULASGN factor SEMICOLON  (32)
+	expr_asgn : id . DIVASGN factor SEMICOLON  (33)
+	expr_asgn : id . MODASGN factor SEMICOLONE  (34)
+
+	ASGN  shift 36
+	ADDASGN  shift 37
+	SUBASGN  shift 38
+	MULASGN  shift 39
+	DIVASGN  shift 40
+	MODASGN  shift 41
+	.  error
+
+
+state 16
+	program : program stat .  (1)
+
+	.  reduce 1
+
+
+state 17
+	stat : declaration .  (5)
+
+	.  reduce 5
+
+
+state 18
+	stat : compound_stat .  (6)
+
+	.  reduce 6
+
+
+state 19
+	stat : function_decl .  (9)
 
 	.  reduce 9
 
 
-state 16
-	stat : compound_stat .  (10)
+state 20
+	stat : function_def .  (10)
 
 	.  reduce 10
 
 
-state 17
-	stat : function_decl .  (13)
-
-	.  reduce 13
-
-
-state 18
-	stat : function_def .  (14)
-
-	.  reduce 14
-
-
-state 19
-	compound_stat : if_stat .  (59)
-
-	.  reduce 59
-
-
-state 20
-	compound_stat : while_stat .  (60)
-
-	.  reduce 60
-
-
 state 21
-	stat : expression_stat4 . semicolon  (12)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-	semicolon : .  (24)
+	compound_stat : if_stat .  (54)
 
-	SEMICOLON  shift 39
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	$end  reduce 24
-	IF  reduce 24
-	NEWLINE  reduce 24
-	WHILE  reduce 24
-	LB  reduce 24
-	I_CONST  reduce 24
-	F_CONST  reduce 24
-	BOOL  reduce 24
-	INT  reduce 24
-	STRING  reduce 24
-	FLOAT  reduce 24
-	VOID  reduce 24
-	ID  reduce 24
-
-	semicolon  goto 46
+	.  reduce 54
 
 
 state 22
-	stat : expr_asgn . SEMICOLON  (11)
+	compound_stat : while_stat .  (55)
 
-	SEMICOLON  shift 47
-	.  error
+	.  reduce 55
 
 
 state 23
-	expression_stat4 : expression_stat3 .  (71)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
+	factor : function_call .  (84)
 
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 71
-	PRINT  reduce 71
-	IF  reduce 71
-	SEMICOLON  reduce 71
-	NEWLINE  reduce 71
-	MT  reduce 71
-	LT  reduce 71
-	MTE  reduce 71
-	LTE  reduce 71
-	EQ  reduce 71
-	NE  reduce 71
-	WHILE  reduce 71
-	LB  reduce 71
-	RB  reduce 71
-	RCB  reduce 71
-	RET  reduce 71
-	I_CONST  reduce 71
-	F_CONST  reduce 71
-	BOOL  reduce 71
-	INT  reduce 71
-	STRING  reduce 71
-	FLOAT  reduce 71
-	VOID  reduce 71
-	ID  reduce 71
+	.  reduce 84
 
 
 state 24
-	expression_stat3 : expression_stat2 .  (74)
-	expression_stat2 : expression_stat2 . MUL expression_stat1  (75)
-	expression_stat2 : expression_stat2 . DIV expression_stat1  (76)
-	expression_stat2 : expression_stat2 . MOD expression_stat1  (77)
+	stat : expression_stat4 . semicolon  (8)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+	semicolon : .  (20)
 
-	MUL  shift 50
-	DIV  shift 51
-	MOD  shift 52
-	$end  reduce 74
-	PRINT  reduce 74
-	IF  reduce 74
-	SEMICOLON  reduce 74
-	NEWLINE  reduce 74
-	ADD  reduce 74
-	SUB  reduce 74
-	MT  reduce 74
-	LT  reduce 74
-	MTE  reduce 74
-	LTE  reduce 74
-	EQ  reduce 74
-	NE  reduce 74
-	WHILE  reduce 74
-	LB  reduce 74
-	RB  reduce 74
-	RCB  reduce 74
-	RET  reduce 74
-	I_CONST  reduce 74
-	F_CONST  reduce 74
-	BOOL  reduce 74
-	INT  reduce 74
-	STRING  reduce 74
-	FLOAT  reduce 74
-	VOID  reduce 74
-	ID  reduce 74
+	SEMICOLON  shift 42
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	$end  reduce 20
+	IF  reduce 20
+	WHILE  reduce 20
+	LB  reduce 20
+	I_CONST  reduce 20
+	F_CONST  reduce 20
+	BOOL  reduce 20
+	INT  reduce 20
+	STRING  reduce 20
+	FLOAT  reduce 20
+	VOID  reduce 20
+	ID  reduce 20
+
+	semicolon  goto 49
 
 
 state 25
-	expression_stat2 : expression_stat1 .  (78)
-	expression_stat1 : expression_stat1 . INC  (79)
-	expression_stat1 : expression_stat1 . DEC  (80)
+	stat : expr_asgn .  (7)
 
-	INC  shift 53
-	DEC  shift 54
-	$end  reduce 78
-	PRINT  reduce 78
-	IF  reduce 78
-	SEMICOLON  reduce 78
-	NEWLINE  reduce 78
-	ADD  reduce 78
-	SUB  reduce 78
-	MUL  reduce 78
-	DIV  reduce 78
-	MOD  reduce 78
-	MT  reduce 78
-	LT  reduce 78
-	MTE  reduce 78
-	LTE  reduce 78
-	EQ  reduce 78
-	NE  reduce 78
-	WHILE  reduce 78
-	LB  reduce 78
-	RB  reduce 78
-	RCB  reduce 78
-	RET  reduce 78
-	I_CONST  reduce 78
-	F_CONST  reduce 78
-	BOOL  reduce 78
-	INT  reduce 78
-	STRING  reduce 78
-	FLOAT  reduce 78
-	VOID  reduce 78
-	ID  reduce 78
+	.  reduce 7
 
 
 state 26
-	expression_stat1 : factor .  (81)
-
-	.  reduce 81
-
-
-state 27
-	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB  (61)
-	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB ELSE if_stat  (62)
-	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB  (63)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat4  goto 55
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 28
-	while_stat : WHILE LB . expression_stat4 RB LCB fprogram RCB  (64)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat4  goto 56
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 29
-	factor : ID .  (83)
-
-	.  reduce 83
-
-
-state 30
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-	factor : LB expression_stat4 . RB  (82)
-
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	RB  shift 57
-	.  error
-
-
-state 31
-	expr_asgn : ID ASGN . expression_stat4  (31)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat4  goto 58
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 32
-	expr_asgn : ID ADDASGN . factor  (32)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	factor  goto 59
-
-
-state 33
-	expr_asgn : ID SUBASGN . factor  (33)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	factor  goto 60
-
-
-state 34
-	expr_asgn : ID MULASGN . factor  (34)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	factor  goto 61
-
-
-state 35
-	expr_asgn : ID DIVASGN . factor  (35)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	factor  goto 62
-
-
-state 36
-	expr_asgn : ID MODASGN . factor  (36)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	factor  goto 63
-
-
-state 37
-	function_decl : type ID . LB argument RB SEMICOLON NEWLINE  (37)
-	function_def : type ID . LB argument RB LCB fprogram RCB  (38)
-	function_def : type ID . LB argument RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
-	declaration : type ID . ASGN initializer SEMICOLON NEWLINE  (53)
-	declaration : type ID . SEMICOLON NEWLINE  (54)
-	declaration : type ID . ASGN expression_stat4 SEMICOLON NEWLINE  (55)
-
-	SEMICOLON  shift 64
-	ASGN  shift 65
-	LB  shift 66
-	.  error
-
-
-state 38
-	program : program stat NEWLINE .  (2)
-
-	.  reduce 2
-
-
-state 39
-	semicolon : SEMICOLON .  (23)
-
-	.  reduce 23
-
-
-state 40
-	expression_stat4 : expression_stat4 MT . expression_stat3  (69)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 67
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 41
-	expression_stat4 : expression_stat4 LT . expression_stat3  (70)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 68
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 42
-	expression_stat4 : expression_stat4 MTE . expression_stat3  (66)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 69
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 43
-	expression_stat4 : expression_stat4 LTE . expression_stat3  (67)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 70
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 44
-	expression_stat4 : expression_stat4 EQ . expression_stat3  (65)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 71
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 45
-	expression_stat4 : expression_stat4 NE . expression_stat3  (68)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat3  goto 72
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 46
-	stat : expression_stat4 semicolon .  (12)
-
-	.  reduce 12
-
-
-state 47
-	stat : expr_asgn SEMICOLON .  (11)
-
-	.  reduce 11
-
-
-state 48
-	expression_stat3 : expression_stat3 ADD . expression_stat2  (72)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat2  goto 73
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 49
-	expression_stat3 : expression_stat3 SUB . expression_stat2  (73)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat2  goto 74
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 50
-	expression_stat2 : expression_stat2 MUL . expression_stat1  (75)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat1  goto 75
-	factor  goto 26
-
-
-state 51
-	expression_stat2 : expression_stat2 DIV . expression_stat1  (76)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat1  goto 76
-	factor  goto 26
-
-
-state 52
-	expression_stat2 : expression_stat2 MOD . expression_stat1  (77)
-
-	LB  shift 4
-	I_CONST  shift 5
-	F_CONST  shift 6
-	ID  shift 29
-	.  error
-
-	expression_stat1  goto 77
-	factor  goto 26
-
-
-state 53
-	expression_stat1 : expression_stat1 INC .  (79)
-
-	.  reduce 79
-
-
-state 54
-	expression_stat1 : expression_stat1 DEC .  (80)
-
-	.  reduce 80
-
-
-state 55
-	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB  (61)
-	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB ELSE if_stat  (62)
-	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB  (63)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	RB  shift 78
-	.  error
-
-
-state 56
-	while_stat : WHILE LB expression_stat4 . RB LCB fprogram RCB  (64)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	RB  shift 79
-	.  error
-
-
-state 57
-	factor : LB expression_stat4 RB .  (82)
-
-	.  reduce 82
-
-
-state 58
-	expr_asgn : ID ASGN expression_stat4 .  (31)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	SEMICOLON  reduce 31
-
-
-state 59
-	expr_asgn : ID ADDASGN factor .  (32)
-
-	.  reduce 32
-
-
-state 60
-	expr_asgn : ID SUBASGN factor .  (33)
-
-	.  reduce 33
-
-
-state 61
-	expr_asgn : ID MULASGN factor .  (34)
-
-	.  reduce 34
-
-
-state 62
-	expr_asgn : ID DIVASGN factor .  (35)
-
-	.  reduce 35
-
-
-state 63
-	expr_asgn : ID MODASGN factor .  (36)
-
-	.  reduce 36
-
-
-state 64
-	declaration : type ID SEMICOLON . NEWLINE  (54)
-
-	NEWLINE  shift 80
-	.  error
-
-
-state 65
-	declaration : type ID ASGN . initializer SEMICOLON NEWLINE  (53)
-	declaration : type ID ASGN . expression_stat4 SEMICOLON NEWLINE  (55)
-
-	LB  shift 4
-	I_CONST  shift 81
-	F_CONST  shift 82
-	STR_CONST  shift 83
-	ID  shift 29
-	.  error
-
-	expression_stat4  goto 84
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-	initializer  goto 85
-
-
-state 66
-	function_decl : type ID LB . argument RB SEMICOLON NEWLINE  (37)
-	function_def : type ID LB . argument RB LCB fprogram RCB  (38)
-	function_def : type ID LB . argument RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
-	argument : .  (52)
-
-	BOOL  shift 7
-	INT  shift 8
-	STRING  shift 9
-	FLOAT  shift 10
-	VOID  shift 11
-	COMMA  reduce 52
-	RB  reduce 52
-
-	type  goto 86
-	argument  goto 87
-
-
-state 67
-	expression_stat4 : expression_stat4 MT expression_stat3 .  (69)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
-
-	ADD  shift 48
-	SUB  shift 49
+	expression_stat4 : expression_stat3 .  (69)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
 	$end  reduce 69
 	PRINT  reduce 69
 	IF  reduce 69
 	SEMICOLON  reduce 69
-	NEWLINE  reduce 69
 	MT  reduce 69
 	LT  reduce 69
 	MTE  reduce 69
 	LTE  reduce 69
 	EQ  reduce 69
 	NE  reduce 69
+	COMMA  reduce 69
 	WHILE  reduce 69
 	LB  reduce 69
 	RB  reduce 69
@@ -1035,185 +463,19 @@ state 67
 	ID  reduce 69
 
 
-state 68
-	expression_stat4 : expression_stat4 LT expression_stat3 .  (70)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
+state 27
+	expression_stat3 : expression_stat2 .  (72)
+	expression_stat2 : expression_stat2 . MUL expression_stat1  (73)
+	expression_stat2 : expression_stat2 . DIV expression_stat1  (74)
+	expression_stat2 : expression_stat2 . MOD expression_stat1  (75)
 
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 70
-	PRINT  reduce 70
-	IF  reduce 70
-	SEMICOLON  reduce 70
-	NEWLINE  reduce 70
-	MT  reduce 70
-	LT  reduce 70
-	MTE  reduce 70
-	LTE  reduce 70
-	EQ  reduce 70
-	NE  reduce 70
-	WHILE  reduce 70
-	LB  reduce 70
-	RB  reduce 70
-	RCB  reduce 70
-	RET  reduce 70
-	I_CONST  reduce 70
-	F_CONST  reduce 70
-	BOOL  reduce 70
-	INT  reduce 70
-	STRING  reduce 70
-	FLOAT  reduce 70
-	VOID  reduce 70
-	ID  reduce 70
-
-
-state 69
-	expression_stat4 : expression_stat4 MTE expression_stat3 .  (66)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
-
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 66
-	PRINT  reduce 66
-	IF  reduce 66
-	SEMICOLON  reduce 66
-	NEWLINE  reduce 66
-	MT  reduce 66
-	LT  reduce 66
-	MTE  reduce 66
-	LTE  reduce 66
-	EQ  reduce 66
-	NE  reduce 66
-	WHILE  reduce 66
-	LB  reduce 66
-	RB  reduce 66
-	RCB  reduce 66
-	RET  reduce 66
-	I_CONST  reduce 66
-	F_CONST  reduce 66
-	BOOL  reduce 66
-	INT  reduce 66
-	STRING  reduce 66
-	FLOAT  reduce 66
-	VOID  reduce 66
-	ID  reduce 66
-
-
-state 70
-	expression_stat4 : expression_stat4 LTE expression_stat3 .  (67)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
-
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 67
-	PRINT  reduce 67
-	IF  reduce 67
-	SEMICOLON  reduce 67
-	NEWLINE  reduce 67
-	MT  reduce 67
-	LT  reduce 67
-	MTE  reduce 67
-	LTE  reduce 67
-	EQ  reduce 67
-	NE  reduce 67
-	WHILE  reduce 67
-	LB  reduce 67
-	RB  reduce 67
-	RCB  reduce 67
-	RET  reduce 67
-	I_CONST  reduce 67
-	F_CONST  reduce 67
-	BOOL  reduce 67
-	INT  reduce 67
-	STRING  reduce 67
-	FLOAT  reduce 67
-	VOID  reduce 67
-	ID  reduce 67
-
-
-state 71
-	expression_stat4 : expression_stat4 EQ expression_stat3 .  (65)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
-
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 65
-	PRINT  reduce 65
-	IF  reduce 65
-	SEMICOLON  reduce 65
-	NEWLINE  reduce 65
-	MT  reduce 65
-	LT  reduce 65
-	MTE  reduce 65
-	LTE  reduce 65
-	EQ  reduce 65
-	NE  reduce 65
-	WHILE  reduce 65
-	LB  reduce 65
-	RB  reduce 65
-	RCB  reduce 65
-	RET  reduce 65
-	I_CONST  reduce 65
-	F_CONST  reduce 65
-	BOOL  reduce 65
-	INT  reduce 65
-	STRING  reduce 65
-	FLOAT  reduce 65
-	VOID  reduce 65
-	ID  reduce 65
-
-
-state 72
-	expression_stat4 : expression_stat4 NE expression_stat3 .  (68)
-	expression_stat3 : expression_stat3 . ADD expression_stat2  (72)
-	expression_stat3 : expression_stat3 . SUB expression_stat2  (73)
-
-	ADD  shift 48
-	SUB  shift 49
-	$end  reduce 68
-	PRINT  reduce 68
-	IF  reduce 68
-	SEMICOLON  reduce 68
-	NEWLINE  reduce 68
-	MT  reduce 68
-	LT  reduce 68
-	MTE  reduce 68
-	LTE  reduce 68
-	EQ  reduce 68
-	NE  reduce 68
-	WHILE  reduce 68
-	LB  reduce 68
-	RB  reduce 68
-	RCB  reduce 68
-	RET  reduce 68
-	I_CONST  reduce 68
-	F_CONST  reduce 68
-	BOOL  reduce 68
-	INT  reduce 68
-	STRING  reduce 68
-	FLOAT  reduce 68
-	VOID  reduce 68
-	ID  reduce 68
-
-
-state 73
-	expression_stat3 : expression_stat3 ADD expression_stat2 .  (72)
-	expression_stat2 : expression_stat2 . MUL expression_stat1  (75)
-	expression_stat2 : expression_stat2 . DIV expression_stat1  (76)
-	expression_stat2 : expression_stat2 . MOD expression_stat1  (77)
-
-	MUL  shift 50
-	DIV  shift 51
-	MOD  shift 52
+	MUL  shift 52
+	DIV  shift 53
+	MOD  shift 54
 	$end  reduce 72
 	PRINT  reduce 72
 	IF  reduce 72
 	SEMICOLON  reduce 72
-	NEWLINE  reduce 72
 	ADD  reduce 72
 	SUB  reduce 72
 	MT  reduce 72
@@ -1222,6 +484,7 @@ state 73
 	LTE  reduce 72
 	EQ  reduce 72
 	NE  reduce 72
+	COMMA  reduce 72
 	WHILE  reduce 72
 	LB  reduce 72
 	RB  reduce 72
@@ -1237,93 +500,17 @@ state 73
 	ID  reduce 72
 
 
-state 74
-	expression_stat3 : expression_stat3 SUB expression_stat2 .  (73)
-	expression_stat2 : expression_stat2 . MUL expression_stat1  (75)
-	expression_stat2 : expression_stat2 . DIV expression_stat1  (76)
-	expression_stat2 : expression_stat2 . MOD expression_stat1  (77)
+state 28
+	expression_stat2 : expression_stat1 .  (76)
+	expression_stat1 : expression_stat1 . INC  (77)
+	expression_stat1 : expression_stat1 . DEC  (78)
 
-	MUL  shift 50
-	DIV  shift 51
-	MOD  shift 52
-	$end  reduce 73
-	PRINT  reduce 73
-	IF  reduce 73
-	SEMICOLON  reduce 73
-	NEWLINE  reduce 73
-	ADD  reduce 73
-	SUB  reduce 73
-	MT  reduce 73
-	LT  reduce 73
-	MTE  reduce 73
-	LTE  reduce 73
-	EQ  reduce 73
-	NE  reduce 73
-	WHILE  reduce 73
-	LB  reduce 73
-	RB  reduce 73
-	RCB  reduce 73
-	RET  reduce 73
-	I_CONST  reduce 73
-	F_CONST  reduce 73
-	BOOL  reduce 73
-	INT  reduce 73
-	STRING  reduce 73
-	FLOAT  reduce 73
-	VOID  reduce 73
-	ID  reduce 73
-
-
-state 75
-	expression_stat2 : expression_stat2 MUL expression_stat1 .  (75)
-	expression_stat1 : expression_stat1 . INC  (79)
-	expression_stat1 : expression_stat1 . DEC  (80)
-
-	INC  shift 53
-	DEC  shift 54
-	$end  reduce 75
-	PRINT  reduce 75
-	IF  reduce 75
-	SEMICOLON  reduce 75
-	NEWLINE  reduce 75
-	ADD  reduce 75
-	SUB  reduce 75
-	MUL  reduce 75
-	DIV  reduce 75
-	MOD  reduce 75
-	MT  reduce 75
-	LT  reduce 75
-	MTE  reduce 75
-	LTE  reduce 75
-	EQ  reduce 75
-	NE  reduce 75
-	WHILE  reduce 75
-	LB  reduce 75
-	RB  reduce 75
-	RCB  reduce 75
-	RET  reduce 75
-	I_CONST  reduce 75
-	F_CONST  reduce 75
-	BOOL  reduce 75
-	INT  reduce 75
-	STRING  reduce 75
-	FLOAT  reduce 75
-	VOID  reduce 75
-	ID  reduce 75
-
-
-state 76
-	expression_stat2 : expression_stat2 DIV expression_stat1 .  (76)
-	expression_stat1 : expression_stat1 . INC  (79)
-	expression_stat1 : expression_stat1 . DEC  (80)
-
-	INC  shift 53
-	DEC  shift 54
+	INC  shift 55
+	DEC  shift 56
 	$end  reduce 76
 	PRINT  reduce 76
 	IF  reduce 76
 	SEMICOLON  reduce 76
-	NEWLINE  reduce 76
 	ADD  reduce 76
 	SUB  reduce 76
 	MUL  reduce 76
@@ -1335,6 +522,7 @@ state 76
 	LTE  reduce 76
 	EQ  reduce 76
 	NE  reduce 76
+	COMMA  reduce 76
 	WHILE  reduce 76
 	LB  reduce 76
 	RB  reduce 76
@@ -1350,174 +538,1195 @@ state 76
 	ID  reduce 76
 
 
-state 77
-	expression_stat2 : expression_stat2 MOD expression_stat1 .  (77)
-	expression_stat1 : expression_stat1 . INC  (79)
-	expression_stat1 : expression_stat1 . DEC  (80)
+state 29
+	expression_stat1 : factor .  (79)
 
-	INC  shift 53
-	DEC  shift 54
-	$end  reduce 77
-	PRINT  reduce 77
-	IF  reduce 77
-	SEMICOLON  reduce 77
-	NEWLINE  reduce 77
-	ADD  reduce 77
-	SUB  reduce 77
-	MUL  reduce 77
-	DIV  reduce 77
-	MOD  reduce 77
-	MT  reduce 77
-	LT  reduce 77
-	MTE  reduce 77
-	LTE  reduce 77
-	EQ  reduce 77
-	NE  reduce 77
-	WHILE  reduce 77
-	LB  reduce 77
-	RB  reduce 77
-	RCB  reduce 77
-	RET  reduce 77
-	I_CONST  reduce 77
-	F_CONST  reduce 77
-	BOOL  reduce 77
-	INT  reduce 77
-	STRING  reduce 77
-	FLOAT  reduce 77
-	VOID  reduce 77
-	ID  reduce 77
+	.  reduce 79
 
 
-state 78
-	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB  (61)
-	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB ELSE if_stat  (62)
-	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB  (63)
+state 30
+	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB  (56)
+	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB else_stat  (57)
+	if_stat : IF LB . expression_stat4 RB LCB fprogram RCB elseif_stat  (58)
 
-	LCB  shift 88
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 57
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 31
+	while_stat : WHILE LB . expression_stat4 RB LCB fprogram RCB  (62)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 58
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+32: reduce/reduce conflict (reduce 23, reduce 81) on LB
+state 32
+	func_id : ID .  (23)
+	factor : ID .  (81)
+
+	$end  reduce 81
+	PRINT  reduce 81
+	IF  reduce 81
+	SEMICOLON  reduce 81
+	ADD  reduce 81
+	SUB  reduce 81
+	MUL  reduce 81
+	DIV  reduce 81
+	MOD  reduce 81
+	INC  reduce 81
+	DEC  reduce 81
+	MT  reduce 81
+	LT  reduce 81
+	MTE  reduce 81
+	LTE  reduce 81
+	EQ  reduce 81
+	NE  reduce 81
+	COMMA  reduce 81
+	WHILE  reduce 81
+	LB  reduce 23
+	RB  reduce 81
+	RCB  reduce 81
+	RET  reduce 81
+	I_CONST  reduce 81
+	F_CONST  reduce 81
+	BOOL  reduce 81
+	INT  reduce 81
+	STRING  reduce 81
+	FLOAT  reduce 81
+	VOID  reduce 81
+	ID  reduce 81
+	SEMICOLONE  reduce 81
+
+
+state 33
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+	factor : LB expression_stat4 . RB  (80)
+
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	RB  shift 59
 	.  error
 
 
-state 79
-	while_stat : WHILE LB expression_stat4 RB . LCB fprogram RCB  (64)
+state 34
+	function_decl : type ID . LB argument RB SEMICOLON  (35)
+	function_def : type ID . LB argument RB LCB fprogram RCB  (36)
+	function_def : type ID . LB argument RB LCB fprogram return RCB  (37)
+	declaration : type ID . ASGN initializer SEMICOLON  (48)
+	declaration : type ID . SEMICOLON  (49)
+	declaration : type ID . ASGN expression_stat4 SEMICOLON  (50)
 
-	LCB  shift 89
+	SEMICOLON  shift 60
+	ASGN  shift 61
+	LB  shift 62
 	.  error
 
 
-state 80
-	declaration : type ID SEMICOLON NEWLINE .  (54)
+state 35
+	function_call : func_id LB . parameter RB  (22)
 
-	.  reduce 54
+	LB  shift 4
+	I_CONST  shift 63
+	F_CONST  shift 64
+	STR_CONST  shift 65
+	ID  shift 12
+	.  error
+
+	func_id  goto 14
+	id  goto 66
+	function_call  goto 23
+	parameter  goto 67
+	pass  goto 68
+	expression_stat4  goto 69
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+	initializer  goto 70
 
 
-81: reduce/reduce conflict (reduce 84, reduce 88) on SEMICOLON
-state 81
-	factor : I_CONST .  (84)
+state 36
+	expr_asgn : id ASGN . expression_stat4 SEMICOLON  (29)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 71
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 37
+	expr_asgn : id ADDASGN . factor SEMICOLON  (30)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	factor  goto 72
+
+
+state 38
+	expr_asgn : id SUBASGN . factor SEMICOLON  (31)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	factor  goto 73
+
+
+state 39
+	expr_asgn : id MULASGN . factor SEMICOLON  (32)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	factor  goto 74
+
+
+state 40
+	expr_asgn : id DIVASGN . factor SEMICOLON  (33)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	factor  goto 75
+
+
+state 41
+	expr_asgn : id MODASGN . factor SEMICOLONE  (34)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	factor  goto 76
+
+
+state 42
+	semicolon : SEMICOLON .  (19)
+
+	.  reduce 19
+
+
+state 43
+	expression_stat4 : expression_stat4 MT . expression_stat3  (67)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 77
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 44
+	expression_stat4 : expression_stat4 LT . expression_stat3  (68)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 78
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 45
+	expression_stat4 : expression_stat4 MTE . expression_stat3  (64)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 79
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 46
+	expression_stat4 : expression_stat4 LTE . expression_stat3  (65)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 80
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 47
+	expression_stat4 : expression_stat4 EQ . expression_stat3  (63)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 81
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 48
+	expression_stat4 : expression_stat4 NE . expression_stat3  (66)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat3  goto 82
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 49
+	stat : expression_stat4 semicolon .  (8)
+
+	.  reduce 8
+
+
+state 50
+	expression_stat3 : expression_stat3 ADD . expression_stat2  (70)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat2  goto 83
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 51
+	expression_stat3 : expression_stat3 SUB . expression_stat2  (71)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat2  goto 84
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 52
+	expression_stat2 : expression_stat2 MUL . expression_stat1  (73)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat1  goto 85
+	factor  goto 29
+
+
+state 53
+	expression_stat2 : expression_stat2 DIV . expression_stat1  (74)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat1  goto 86
+	factor  goto 29
+
+
+state 54
+	expression_stat2 : expression_stat2 MOD . expression_stat1  (75)
+
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat1  goto 87
+	factor  goto 29
+
+
+state 55
+	expression_stat1 : expression_stat1 INC .  (77)
+
+	.  reduce 77
+
+
+state 56
+	expression_stat1 : expression_stat1 DEC .  (78)
+
+	.  reduce 78
+
+
+state 57
+	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB  (56)
+	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB else_stat  (57)
+	if_stat : IF LB expression_stat4 . RB LCB fprogram RCB elseif_stat  (58)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	RB  shift 88
+	.  error
+
+
+state 58
+	while_stat : WHILE LB expression_stat4 . RB LCB fprogram RCB  (62)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	RB  shift 89
+	.  error
+
+
+state 59
+	factor : LB expression_stat4 RB .  (80)
+
+	.  reduce 80
+
+
+state 60
+	declaration : type ID SEMICOLON .  (49)
+
+	.  reduce 49
+
+
+state 61
+	declaration : type ID ASGN . initializer SEMICOLON  (48)
+	declaration : type ID ASGN . expression_stat4 SEMICOLON  (50)
+
+	LB  shift 4
+	I_CONST  shift 63
+	F_CONST  shift 64
+	STR_CONST  shift 65
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 90
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+	initializer  goto 91
+
+
+state 62
+	function_decl : type ID LB . argument RB SEMICOLON  (35)
+	function_def : type ID LB . argument RB LCB fprogram RCB  (36)
+	function_def : type ID LB . argument RB LCB fprogram return RCB  (37)
+	argument : .  (47)
+
+	BOOL  shift 7
+	INT  shift 8
+	STRING  shift 9
+	FLOAT  shift 10
+	VOID  shift 11
+	COMMA  reduce 47
+	RB  reduce 47
+
+	type  goto 92
+	argument  goto 93
+
+
+63: reduce/reduce conflict (reduce 82, reduce 88) on SEMICOLON
+63: reduce/reduce conflict (reduce 82, reduce 88) on COMMA
+63: reduce/reduce conflict (reduce 82, reduce 88) on RB
+state 63
+	factor : I_CONST .  (82)
 	initializer : I_CONST .  (88)
 
-	.  reduce 84
+	.  reduce 82
 
 
-82: reduce/reduce conflict (reduce 85, reduce 89) on SEMICOLON
-state 82
-	factor : F_CONST .  (85)
+64: reduce/reduce conflict (reduce 83, reduce 89) on SEMICOLON
+64: reduce/reduce conflict (reduce 83, reduce 89) on COMMA
+64: reduce/reduce conflict (reduce 83, reduce 89) on RB
+state 64
+	factor : F_CONST .  (83)
 	initializer : F_CONST .  (89)
 
-	.  reduce 85
+	.  reduce 83
 
 
-state 83
+state 65
 	initializer : STR_CONST .  (90)
 
 	.  reduce 90
 
 
-state 84
-	declaration : type ID ASGN expression_stat4 . SEMICOLON NEWLINE  (55)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
+state 66
+	pass : id .  (27)
 
-	SEMICOLON  shift 90
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
+	.  reduce 27
+
+
+state 67
+	function_call : func_id LB parameter . RB  (22)
+	parameter : parameter . COMMA pass  (25)
+
+	COMMA  shift 94
+	RB  shift 95
 	.  error
+
+
+state 68
+	parameter : pass .  (24)
+
+	.  reduce 24
+
+
+state 69
+	parameter : expression_stat4 .  (26)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	COMMA  reduce 26
+	RB  reduce 26
+
+
+state 70
+	pass : initializer .  (28)
+
+	.  reduce 28
+
+
+state 71
+	expr_asgn : id ASGN expression_stat4 . SEMICOLON  (29)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+
+	SEMICOLON  shift 96
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	.  error
+
+
+state 72
+	expr_asgn : id ADDASGN factor . SEMICOLON  (30)
+
+	SEMICOLON  shift 97
+	.  error
+
+
+state 73
+	expr_asgn : id SUBASGN factor . SEMICOLON  (31)
+
+	SEMICOLON  shift 98
+	.  error
+
+
+state 74
+	expr_asgn : id MULASGN factor . SEMICOLON  (32)
+
+	SEMICOLON  shift 99
+	.  error
+
+
+state 75
+	expr_asgn : id DIVASGN factor . SEMICOLON  (33)
+
+	SEMICOLON  shift 100
+	.  error
+
+
+state 76
+	expr_asgn : id MODASGN factor . SEMICOLONE  (34)
+
+	SEMICOLONE  shift 101
+	.  error
+
+
+state 77
+	expression_stat4 : expression_stat4 MT expression_stat3 .  (67)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 67
+	PRINT  reduce 67
+	IF  reduce 67
+	SEMICOLON  reduce 67
+	MT  reduce 67
+	LT  reduce 67
+	MTE  reduce 67
+	LTE  reduce 67
+	EQ  reduce 67
+	NE  reduce 67
+	COMMA  reduce 67
+	WHILE  reduce 67
+	LB  reduce 67
+	RB  reduce 67
+	RCB  reduce 67
+	RET  reduce 67
+	I_CONST  reduce 67
+	F_CONST  reduce 67
+	BOOL  reduce 67
+	INT  reduce 67
+	STRING  reduce 67
+	FLOAT  reduce 67
+	VOID  reduce 67
+	ID  reduce 67
+
+
+state 78
+	expression_stat4 : expression_stat4 LT expression_stat3 .  (68)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 68
+	PRINT  reduce 68
+	IF  reduce 68
+	SEMICOLON  reduce 68
+	MT  reduce 68
+	LT  reduce 68
+	MTE  reduce 68
+	LTE  reduce 68
+	EQ  reduce 68
+	NE  reduce 68
+	COMMA  reduce 68
+	WHILE  reduce 68
+	LB  reduce 68
+	RB  reduce 68
+	RCB  reduce 68
+	RET  reduce 68
+	I_CONST  reduce 68
+	F_CONST  reduce 68
+	BOOL  reduce 68
+	INT  reduce 68
+	STRING  reduce 68
+	FLOAT  reduce 68
+	VOID  reduce 68
+	ID  reduce 68
+
+
+state 79
+	expression_stat4 : expression_stat4 MTE expression_stat3 .  (64)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 64
+	PRINT  reduce 64
+	IF  reduce 64
+	SEMICOLON  reduce 64
+	MT  reduce 64
+	LT  reduce 64
+	MTE  reduce 64
+	LTE  reduce 64
+	EQ  reduce 64
+	NE  reduce 64
+	COMMA  reduce 64
+	WHILE  reduce 64
+	LB  reduce 64
+	RB  reduce 64
+	RCB  reduce 64
+	RET  reduce 64
+	I_CONST  reduce 64
+	F_CONST  reduce 64
+	BOOL  reduce 64
+	INT  reduce 64
+	STRING  reduce 64
+	FLOAT  reduce 64
+	VOID  reduce 64
+	ID  reduce 64
+
+
+state 80
+	expression_stat4 : expression_stat4 LTE expression_stat3 .  (65)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 65
+	PRINT  reduce 65
+	IF  reduce 65
+	SEMICOLON  reduce 65
+	MT  reduce 65
+	LT  reduce 65
+	MTE  reduce 65
+	LTE  reduce 65
+	EQ  reduce 65
+	NE  reduce 65
+	COMMA  reduce 65
+	WHILE  reduce 65
+	LB  reduce 65
+	RB  reduce 65
+	RCB  reduce 65
+	RET  reduce 65
+	I_CONST  reduce 65
+	F_CONST  reduce 65
+	BOOL  reduce 65
+	INT  reduce 65
+	STRING  reduce 65
+	FLOAT  reduce 65
+	VOID  reduce 65
+	ID  reduce 65
+
+
+state 81
+	expression_stat4 : expression_stat4 EQ expression_stat3 .  (63)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 63
+	PRINT  reduce 63
+	IF  reduce 63
+	SEMICOLON  reduce 63
+	MT  reduce 63
+	LT  reduce 63
+	MTE  reduce 63
+	LTE  reduce 63
+	EQ  reduce 63
+	NE  reduce 63
+	COMMA  reduce 63
+	WHILE  reduce 63
+	LB  reduce 63
+	RB  reduce 63
+	RCB  reduce 63
+	RET  reduce 63
+	I_CONST  reduce 63
+	F_CONST  reduce 63
+	BOOL  reduce 63
+	INT  reduce 63
+	STRING  reduce 63
+	FLOAT  reduce 63
+	VOID  reduce 63
+	ID  reduce 63
+
+
+state 82
+	expression_stat4 : expression_stat4 NE expression_stat3 .  (66)
+	expression_stat3 : expression_stat3 . ADD expression_stat2  (70)
+	expression_stat3 : expression_stat3 . SUB expression_stat2  (71)
+
+	ADD  shift 50
+	SUB  shift 51
+	$end  reduce 66
+	PRINT  reduce 66
+	IF  reduce 66
+	SEMICOLON  reduce 66
+	MT  reduce 66
+	LT  reduce 66
+	MTE  reduce 66
+	LTE  reduce 66
+	EQ  reduce 66
+	NE  reduce 66
+	COMMA  reduce 66
+	WHILE  reduce 66
+	LB  reduce 66
+	RB  reduce 66
+	RCB  reduce 66
+	RET  reduce 66
+	I_CONST  reduce 66
+	F_CONST  reduce 66
+	BOOL  reduce 66
+	INT  reduce 66
+	STRING  reduce 66
+	FLOAT  reduce 66
+	VOID  reduce 66
+	ID  reduce 66
+
+
+state 83
+	expression_stat3 : expression_stat3 ADD expression_stat2 .  (70)
+	expression_stat2 : expression_stat2 . MUL expression_stat1  (73)
+	expression_stat2 : expression_stat2 . DIV expression_stat1  (74)
+	expression_stat2 : expression_stat2 . MOD expression_stat1  (75)
+
+	MUL  shift 52
+	DIV  shift 53
+	MOD  shift 54
+	$end  reduce 70
+	PRINT  reduce 70
+	IF  reduce 70
+	SEMICOLON  reduce 70
+	ADD  reduce 70
+	SUB  reduce 70
+	MT  reduce 70
+	LT  reduce 70
+	MTE  reduce 70
+	LTE  reduce 70
+	EQ  reduce 70
+	NE  reduce 70
+	COMMA  reduce 70
+	WHILE  reduce 70
+	LB  reduce 70
+	RB  reduce 70
+	RCB  reduce 70
+	RET  reduce 70
+	I_CONST  reduce 70
+	F_CONST  reduce 70
+	BOOL  reduce 70
+	INT  reduce 70
+	STRING  reduce 70
+	FLOAT  reduce 70
+	VOID  reduce 70
+	ID  reduce 70
+
+
+state 84
+	expression_stat3 : expression_stat3 SUB expression_stat2 .  (71)
+	expression_stat2 : expression_stat2 . MUL expression_stat1  (73)
+	expression_stat2 : expression_stat2 . DIV expression_stat1  (74)
+	expression_stat2 : expression_stat2 . MOD expression_stat1  (75)
+
+	MUL  shift 52
+	DIV  shift 53
+	MOD  shift 54
+	$end  reduce 71
+	PRINT  reduce 71
+	IF  reduce 71
+	SEMICOLON  reduce 71
+	ADD  reduce 71
+	SUB  reduce 71
+	MT  reduce 71
+	LT  reduce 71
+	MTE  reduce 71
+	LTE  reduce 71
+	EQ  reduce 71
+	NE  reduce 71
+	COMMA  reduce 71
+	WHILE  reduce 71
+	LB  reduce 71
+	RB  reduce 71
+	RCB  reduce 71
+	RET  reduce 71
+	I_CONST  reduce 71
+	F_CONST  reduce 71
+	BOOL  reduce 71
+	INT  reduce 71
+	STRING  reduce 71
+	FLOAT  reduce 71
+	VOID  reduce 71
+	ID  reduce 71
 
 
 state 85
-	declaration : type ID ASGN initializer . SEMICOLON NEWLINE  (53)
+	expression_stat2 : expression_stat2 MUL expression_stat1 .  (73)
+	expression_stat1 : expression_stat1 . INC  (77)
+	expression_stat1 : expression_stat1 . DEC  (78)
 
-	SEMICOLON  shift 91
-	.  error
+	INC  shift 55
+	DEC  shift 56
+	$end  reduce 73
+	PRINT  reduce 73
+	IF  reduce 73
+	SEMICOLON  reduce 73
+	ADD  reduce 73
+	SUB  reduce 73
+	MUL  reduce 73
+	DIV  reduce 73
+	MOD  reduce 73
+	MT  reduce 73
+	LT  reduce 73
+	MTE  reduce 73
+	LTE  reduce 73
+	EQ  reduce 73
+	NE  reduce 73
+	COMMA  reduce 73
+	WHILE  reduce 73
+	LB  reduce 73
+	RB  reduce 73
+	RCB  reduce 73
+	RET  reduce 73
+	I_CONST  reduce 73
+	F_CONST  reduce 73
+	BOOL  reduce 73
+	INT  reduce 73
+	STRING  reduce 73
+	FLOAT  reduce 73
+	VOID  reduce 73
+	ID  reduce 73
 
 
 state 86
-	argument : type . ID  (50)
+	expression_stat2 : expression_stat2 DIV expression_stat1 .  (74)
+	expression_stat1 : expression_stat1 . INC  (77)
+	expression_stat1 : expression_stat1 . DEC  (78)
 
-	ID  shift 92
-	.  error
+	INC  shift 55
+	DEC  shift 56
+	$end  reduce 74
+	PRINT  reduce 74
+	IF  reduce 74
+	SEMICOLON  reduce 74
+	ADD  reduce 74
+	SUB  reduce 74
+	MUL  reduce 74
+	DIV  reduce 74
+	MOD  reduce 74
+	MT  reduce 74
+	LT  reduce 74
+	MTE  reduce 74
+	LTE  reduce 74
+	EQ  reduce 74
+	NE  reduce 74
+	COMMA  reduce 74
+	WHILE  reduce 74
+	LB  reduce 74
+	RB  reduce 74
+	RCB  reduce 74
+	RET  reduce 74
+	I_CONST  reduce 74
+	F_CONST  reduce 74
+	BOOL  reduce 74
+	INT  reduce 74
+	STRING  reduce 74
+	FLOAT  reduce 74
+	VOID  reduce 74
+	ID  reduce 74
 
 
 state 87
-	function_decl : type ID LB argument . RB SEMICOLON NEWLINE  (37)
-	function_def : type ID LB argument . RB LCB fprogram RCB  (38)
-	function_def : type ID LB argument . RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
-	argument : argument . COMMA type ID  (51)
+	expression_stat2 : expression_stat2 MOD expression_stat1 .  (75)
+	expression_stat1 : expression_stat1 . INC  (77)
+	expression_stat1 : expression_stat1 . DEC  (78)
 
-	COMMA  shift 93
-	RB  shift 94
-	.  error
+	INC  shift 55
+	DEC  shift 56
+	$end  reduce 75
+	PRINT  reduce 75
+	IF  reduce 75
+	SEMICOLON  reduce 75
+	ADD  reduce 75
+	SUB  reduce 75
+	MUL  reduce 75
+	DIV  reduce 75
+	MOD  reduce 75
+	MT  reduce 75
+	LT  reduce 75
+	MTE  reduce 75
+	LTE  reduce 75
+	EQ  reduce 75
+	NE  reduce 75
+	COMMA  reduce 75
+	WHILE  reduce 75
+	LB  reduce 75
+	RB  reduce 75
+	RCB  reduce 75
+	RET  reduce 75
+	I_CONST  reduce 75
+	F_CONST  reduce 75
+	BOOL  reduce 75
+	INT  reduce 75
+	STRING  reduce 75
+	FLOAT  reduce 75
+	VOID  reduce 75
+	ID  reduce 75
 
 
 state 88
-	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB  (61)
-	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB ELSE if_stat  (62)
-	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB ELSE new_line LCB new_line fprogram RCB  (63)
-	fprogram : .  (6)
+	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB  (56)
+	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB else_stat  (57)
+	if_stat : IF LB expression_stat4 RB . LCB fprogram RCB elseif_stat  (58)
 
-	.  reduce 6
-
-	fprogram  goto 95
+	LCB  shift 102
+	.  error
 
 
 state 89
-	while_stat : WHILE LB expression_stat4 RB LCB . fprogram RCB  (64)
-	fprogram : .  (6)
+	while_stat : WHILE LB expression_stat4 RB . LCB fprogram RCB  (62)
 
-	.  reduce 6
-
-	fprogram  goto 96
+	LCB  shift 103
+	.  error
 
 
 state 90
-	declaration : type ID ASGN expression_stat4 SEMICOLON . NEWLINE  (55)
+	declaration : type ID ASGN expression_stat4 . SEMICOLON  (50)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
 
-	NEWLINE  shift 97
+	SEMICOLON  shift 104
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
 	.  error
 
 
 state 91
-	declaration : type ID ASGN initializer SEMICOLON . NEWLINE  (53)
+	declaration : type ID ASGN initializer . SEMICOLON  (48)
 
-	NEWLINE  shift 98
+	SEMICOLON  shift 105
 	.  error
 
 
 state 92
-	argument : type ID .  (50)
+	argument : type . ID  (45)
+
+	ID  shift 106
+	.  error
+
+
+state 93
+	function_decl : type ID LB argument . RB SEMICOLON  (35)
+	function_def : type ID LB argument . RB LCB fprogram RCB  (36)
+	function_def : type ID LB argument . RB LCB fprogram return RCB  (37)
+	argument : argument . COMMA type ID  (46)
+
+	COMMA  shift 107
+	RB  shift 108
+	.  error
+
+
+state 94
+	parameter : parameter COMMA . pass  (25)
+
+	I_CONST  shift 109
+	F_CONST  shift 110
+	STR_CONST  shift 65
+	ID  shift 111
+	.  error
+
+	id  goto 66
+	pass  goto 112
+	initializer  goto 70
+
+
+state 95
+	function_call : func_id LB parameter RB .  (22)
+
+	.  reduce 22
+
+
+state 96
+	expr_asgn : id ASGN expression_stat4 SEMICOLON .  (29)
+
+	.  reduce 29
+
+
+state 97
+	expr_asgn : id ADDASGN factor SEMICOLON .  (30)
+
+	.  reduce 30
+
+
+state 98
+	expr_asgn : id SUBASGN factor SEMICOLON .  (31)
+
+	.  reduce 31
+
+
+state 99
+	expr_asgn : id MULASGN factor SEMICOLON .  (32)
+
+	.  reduce 32
+
+
+state 100
+	expr_asgn : id DIVASGN factor SEMICOLON .  (33)
+
+	.  reduce 33
+
+
+state 101
+	expr_asgn : id MODASGN factor SEMICOLONE .  (34)
+
+	.  reduce 34
+
+
+state 102
+	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB  (56)
+	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB else_stat  (57)
+	if_stat : IF LB expression_stat4 RB LCB . fprogram RCB elseif_stat  (58)
+	fprogram : .  (4)
+
+	.  reduce 4
+
+	fprogram  goto 113
+
+
+state 103
+	while_stat : WHILE LB expression_stat4 RB LCB . fprogram RCB  (62)
+	fprogram : .  (4)
+
+	.  reduce 4
+
+	fprogram  goto 114
+
+
+state 104
+	declaration : type ID ASGN expression_stat4 SEMICOLON .  (50)
 
 	.  reduce 50
 
 
-state 93
-	argument : argument COMMA . type ID  (51)
+state 105
+	declaration : type ID ASGN initializer SEMICOLON .  (48)
+
+	.  reduce 48
+
+
+state 106
+	argument : type ID .  (45)
+
+	.  reduce 45
+
+
+state 107
+	argument : argument COMMA . type ID  (46)
 
 	BOOL  shift 7
 	INT  shift 8
@@ -1526,45 +1735,68 @@ state 93
 	VOID  shift 11
 	.  error
 
-	type  goto 99
+	type  goto 115
 
 
-state 94
-	function_decl : type ID LB argument RB . SEMICOLON NEWLINE  (37)
-	function_def : type ID LB argument RB . LCB fprogram RCB  (38)
-	function_def : type ID LB argument RB . LCB NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
+state 108
+	function_decl : type ID LB argument RB . SEMICOLON  (35)
+	function_def : type ID LB argument RB . LCB fprogram RCB  (36)
+	function_def : type ID LB argument RB . LCB fprogram return RCB  (37)
 
-	SEMICOLON  shift 100
-	LCB  shift 101
+	SEMICOLON  shift 116
+	LCB  shift 117
 	.  error
 
 
-95: shift/reduce conflict (shift 102, reduce 22) on PRINT
-95: shift/reduce conflict (shift 2, reduce 22) on IF
-95: shift/reduce conflict (shift 3, reduce 22) on WHILE
-95: shift/reduce conflict (shift 4, reduce 22) on LB
-95: shift/reduce conflict (shift 103, reduce 22) on RCB
-95: shift/reduce conflict (shift 5, reduce 22) on I_CONST
-95: shift/reduce conflict (shift 6, reduce 22) on F_CONST
-95: shift/reduce conflict (shift 7, reduce 22) on BOOL
-95: shift/reduce conflict (shift 8, reduce 22) on INT
-95: shift/reduce conflict (shift 9, reduce 22) on STRING
-95: shift/reduce conflict (shift 10, reduce 22) on FLOAT
-95: shift/reduce conflict (shift 11, reduce 22) on VOID
-95: shift/reduce conflict (shift 104, reduce 22) on ID
-state 95
-	fprogram : fprogram . fstat  (4)
-	fprogram : fprogram . fstat NEWLINE  (5)
-	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB  (61)
-	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB ELSE if_stat  (62)
-	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB ELSE new_line LCB new_line fprogram RCB  (63)
-	fstat : .  (22)
+state 109
+	initializer : I_CONST .  (88)
 
-	PRINT  shift 102
+	.  reduce 88
+
+
+state 110
+	initializer : F_CONST .  (89)
+
+	.  reduce 89
+
+
+state 111
+	id : ID .  (85)
+
+	.  reduce 85
+
+
+state 112
+	parameter : parameter COMMA pass .  (25)
+
+	.  reduce 25
+
+
+113: shift/reduce conflict (shift 118, reduce 18) on PRINT
+113: shift/reduce conflict (shift 2, reduce 18) on IF
+113: shift/reduce conflict (shift 3, reduce 18) on WHILE
+113: shift/reduce conflict (shift 4, reduce 18) on LB
+113: shift/reduce conflict (shift 119, reduce 18) on RCB
+113: shift/reduce conflict (shift 5, reduce 18) on I_CONST
+113: shift/reduce conflict (shift 6, reduce 18) on F_CONST
+113: shift/reduce conflict (shift 7, reduce 18) on BOOL
+113: shift/reduce conflict (shift 8, reduce 18) on INT
+113: shift/reduce conflict (shift 9, reduce 18) on STRING
+113: shift/reduce conflict (shift 10, reduce 18) on FLOAT
+113: shift/reduce conflict (shift 11, reduce 18) on VOID
+113: shift/reduce conflict (shift 12, reduce 18) on ID
+state 113
+	fprogram : fprogram . fstat  (3)
+	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB  (56)
+	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB else_stat  (57)
+	if_stat : IF LB expression_stat4 RB LCB fprogram . RCB elseif_stat  (58)
+	fstat : .  (18)
+
+	PRINT  shift 118
 	IF  shift 2
 	WHILE  shift 3
 	LB  shift 4
-	RCB  shift 103
+	RCB  shift 119
 	I_CONST  shift 5
 	F_CONST  shift 6
 	BOOL  shift 7
@@ -1572,49 +1804,50 @@ state 95
 	STRING  shift 9
 	FLOAT  shift 10
 	VOID  shift 11
-	ID  shift 104
-	NEWLINE  reduce 22
+	ID  shift 12
 
-	type  goto 105
-	fstat  goto 106
-	fdeclaration  goto 107
-	compound_stat  goto 108
-	print_func  goto 109
-	if_stat  goto 19
-	while_stat  goto 20
-	function_call  goto 110
-	expression_stat4  goto 111
-	expr_asgn  goto 112
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
+	type  goto 120
+	func_id  goto 121
+	id  goto 15
+	fstat  goto 122
+	fdeclaration  goto 123
+	compound_stat  goto 124
+	print_func  goto 125
+	if_stat  goto 21
+	while_stat  goto 22
+	direct_function_call  goto 126
+	function_call  goto 23
+	expression_stat4  goto 127
+	expr_asgn  goto 128
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
-96: shift/reduce conflict (shift 102, reduce 22) on PRINT
-96: shift/reduce conflict (shift 2, reduce 22) on IF
-96: shift/reduce conflict (shift 3, reduce 22) on WHILE
-96: shift/reduce conflict (shift 4, reduce 22) on LB
-96: shift/reduce conflict (shift 113, reduce 22) on RCB
-96: shift/reduce conflict (shift 5, reduce 22) on I_CONST
-96: shift/reduce conflict (shift 6, reduce 22) on F_CONST
-96: shift/reduce conflict (shift 7, reduce 22) on BOOL
-96: shift/reduce conflict (shift 8, reduce 22) on INT
-96: shift/reduce conflict (shift 9, reduce 22) on STRING
-96: shift/reduce conflict (shift 10, reduce 22) on FLOAT
-96: shift/reduce conflict (shift 11, reduce 22) on VOID
-96: shift/reduce conflict (shift 104, reduce 22) on ID
-state 96
-	fprogram : fprogram . fstat  (4)
-	fprogram : fprogram . fstat NEWLINE  (5)
-	while_stat : WHILE LB expression_stat4 RB LCB fprogram . RCB  (64)
-	fstat : .  (22)
+114: shift/reduce conflict (shift 118, reduce 18) on PRINT
+114: shift/reduce conflict (shift 2, reduce 18) on IF
+114: shift/reduce conflict (shift 3, reduce 18) on WHILE
+114: shift/reduce conflict (shift 4, reduce 18) on LB
+114: shift/reduce conflict (shift 129, reduce 18) on RCB
+114: shift/reduce conflict (shift 5, reduce 18) on I_CONST
+114: shift/reduce conflict (shift 6, reduce 18) on F_CONST
+114: shift/reduce conflict (shift 7, reduce 18) on BOOL
+114: shift/reduce conflict (shift 8, reduce 18) on INT
+114: shift/reduce conflict (shift 9, reduce 18) on STRING
+114: shift/reduce conflict (shift 10, reduce 18) on FLOAT
+114: shift/reduce conflict (shift 11, reduce 18) on VOID
+114: shift/reduce conflict (shift 12, reduce 18) on ID
+state 114
+	fprogram : fprogram . fstat  (3)
+	while_stat : WHILE LB expression_stat4 RB LCB fprogram . RCB  (62)
+	fstat : .  (18)
 
-	PRINT  shift 102
+	PRINT  shift 118
 	IF  shift 2
 	WHILE  shift 3
 	LB  shift 4
-	RCB  shift 113
+	RCB  shift 129
 	I_CONST  shift 5
 	F_CONST  shift 6
 	BOOL  shift 7
@@ -1622,129 +1855,466 @@ state 96
 	STRING  shift 9
 	FLOAT  shift 10
 	VOID  shift 11
-	ID  shift 104
-	NEWLINE  reduce 22
+	ID  shift 12
 
-	type  goto 105
-	fstat  goto 106
-	fdeclaration  goto 107
-	compound_stat  goto 108
-	print_func  goto 109
-	if_stat  goto 19
-	while_stat  goto 20
-	function_call  goto 110
-	expression_stat4  goto 111
-	expr_asgn  goto 112
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 97
-	declaration : type ID ASGN expression_stat4 SEMICOLON NEWLINE .  (55)
-
-	.  reduce 55
+	type  goto 120
+	func_id  goto 121
+	id  goto 15
+	fstat  goto 122
+	fdeclaration  goto 123
+	compound_stat  goto 124
+	print_func  goto 125
+	if_stat  goto 21
+	while_stat  goto 22
+	direct_function_call  goto 126
+	function_call  goto 23
+	expression_stat4  goto 127
+	expr_asgn  goto 128
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
-state 98
-	declaration : type ID ASGN initializer SEMICOLON NEWLINE .  (53)
+state 115
+	argument : argument COMMA type . ID  (46)
 
-	.  reduce 53
-
-
-state 99
-	argument : argument COMMA type . ID  (51)
-
-	ID  shift 114
+	ID  shift 130
 	.  error
 
 
-state 100
-	function_decl : type ID LB argument RB SEMICOLON . NEWLINE  (37)
+state 116
+	function_decl : type ID LB argument RB SEMICOLON .  (35)
 
-	NEWLINE  shift 115
+	.  reduce 35
+
+
+state 117
+	function_def : type ID LB argument RB LCB . fprogram RCB  (36)
+	function_def : type ID LB argument RB LCB . fprogram return RCB  (37)
+	fprogram : .  (4)
+
+	.  reduce 4
+
+	fprogram  goto 131
+
+
+state 118
+	print_func : PRINT . LB ID RB SEMICOLON  (86)
+	print_func : PRINT . LB STR_CONST RB SEMICOLON  (87)
+
+	LB  shift 132
 	.  error
 
 
-101: shift/reduce conflict (shift 116, reduce 6) on NEWLINE
-state 101
-	function_def : type ID LB argument RB LCB . fprogram RCB  (38)
-	function_def : type ID LB argument RB LCB . NEWLINE fprogram return NEWLINE RCB NEWLINE  (39)
-	fprogram : .  (6)
+state 119
+	if_stat : IF LB expression_stat4 RB LCB fprogram RCB .  (56)
+	if_stat : IF LB expression_stat4 RB LCB fprogram RCB . else_stat  (57)
+	if_stat : IF LB expression_stat4 RB LCB fprogram RCB . elseif_stat  (58)
 
-	NEWLINE  shift 116
-	PRINT  reduce 6
-	IF  reduce 6
-	WHILE  reduce 6
-	LB  reduce 6
-	RCB  reduce 6
-	I_CONST  reduce 6
-	F_CONST  reduce 6
-	BOOL  reduce 6
-	INT  reduce 6
-	STRING  reduce 6
-	FLOAT  reduce 6
-	VOID  reduce 6
-	ID  reduce 6
+	ELSE  shift 133
+	$end  reduce 56
+	PRINT  reduce 56
+	IF  reduce 56
+	WHILE  reduce 56
+	LB  reduce 56
+	RCB  reduce 56
+	RET  reduce 56
+	I_CONST  reduce 56
+	F_CONST  reduce 56
+	BOOL  reduce 56
+	INT  reduce 56
+	STRING  reduce 56
+	FLOAT  reduce 56
+	VOID  reduce 56
+	ID  reduce 56
 
-	fprogram  goto 117
+	else_stat  goto 134
+	elseif_stat  goto 135
 
 
-state 102
-	print_func : PRINT . LB ID RB SEMICOLON NEWLINE  (86)
-	print_func : PRINT . LB STR_CONST RB SEMICOLON NEWLINE  (87)
+state 120
+	fdeclaration : type . ID SEMICOLON  (51)
+	fdeclaration : type . ID ASGN initializer SEMICOLON  (52)
+	fdeclaration : type . ID ASGN expression_stat4 SEMICOLON  (53)
 
-	LB  shift 118
+	ID  shift 136
 	.  error
 
 
-state 103
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB .  (61)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB . ELSE if_stat  (62)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB . ELSE new_line LCB new_line fprogram RCB  (63)
+state 121
+	direct_function_call : func_id . LB parameter RB SEMICOLON  (21)
+	function_call : func_id . LB parameter RB  (22)
 
-	ELSE  shift 119
-	$end  reduce 61
-	PRINT  reduce 61
-	IF  reduce 61
-	NEWLINE  reduce 61
-	WHILE  reduce 61
-	LB  reduce 61
-	RCB  reduce 61
-	RET  reduce 61
-	I_CONST  reduce 61
-	F_CONST  reduce 61
-	BOOL  reduce 61
-	INT  reduce 61
-	STRING  reduce 61
-	FLOAT  reduce 61
-	VOID  reduce 61
-	ID  reduce 61
+	LB  shift 137
+	.  error
 
 
-104: shift/reduce conflict (shift 120, reduce 83) on LB
-state 104
-	function_call : ID . LB parameter RB SEMICOLON NEWLINE  (25)
-	expr_asgn : ID . ASGN expression_stat4  (31)
-	expr_asgn : ID . ADDASGN factor  (32)
-	expr_asgn : ID . SUBASGN factor  (33)
-	expr_asgn : ID . MULASGN factor  (34)
-	expr_asgn : ID . DIVASGN factor  (35)
-	expr_asgn : ID . MODASGN factor  (36)
-	factor : ID .  (83)
+state 122
+	fprogram : fprogram fstat .  (3)
 
-	ASGN  shift 31
-	ADDASGN  shift 32
-	SUBASGN  shift 33
-	MULASGN  shift 34
-	DIVASGN  shift 35
-	MODASGN  shift 36
-	LB  shift 120
-	PRINT  reduce 83
-	IF  reduce 83
-	SEMICOLON  reduce 83
-	NEWLINE  reduce 83
+	.  reduce 3
+
+
+state 123
+	fstat : fdeclaration .  (12)
+
+	.  reduce 12
+
+
+state 124
+	fstat : compound_stat .  (13)
+
+	.  reduce 13
+
+
+state 125
+	fstat : print_func .  (17)
+
+	.  reduce 17
+
+
+state 126
+	fstat : direct_function_call .  (16)
+
+	.  reduce 16
+
+
+state 127
+	fstat : expression_stat4 . semicolon  (15)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+	semicolon : .  (20)
+
+	SEMICOLON  shift 42
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	PRINT  reduce 20
+	IF  reduce 20
+	WHILE  reduce 20
+	LB  reduce 20
+	RCB  reduce 20
+	RET  reduce 20
+	I_CONST  reduce 20
+	F_CONST  reduce 20
+	BOOL  reduce 20
+	INT  reduce 20
+	STRING  reduce 20
+	FLOAT  reduce 20
+	VOID  reduce 20
+	ID  reduce 20
+
+	semicolon  goto 138
+
+
+state 128
+	fstat : expr_asgn .  (14)
+
+	.  reduce 14
+
+
+state 129
+	while_stat : WHILE LB expression_stat4 RB LCB fprogram RCB .  (62)
+
+	.  reduce 62
+
+
+state 130
+	argument : argument COMMA type ID .  (46)
+
+	.  reduce 46
+
+
+131: shift/reduce conflict (shift 118, reduce 18) on PRINT
+131: shift/reduce conflict (shift 2, reduce 18) on IF
+131: shift/reduce conflict (shift 3, reduce 18) on WHILE
+131: shift/reduce conflict (shift 4, reduce 18) on LB
+131: shift/reduce conflict (shift 139, reduce 18) on RCB
+131: shift/reduce conflict (shift 140, reduce 18) on RET
+131: shift/reduce conflict (shift 5, reduce 18) on I_CONST
+131: shift/reduce conflict (shift 6, reduce 18) on F_CONST
+131: shift/reduce conflict (shift 7, reduce 18) on BOOL
+131: shift/reduce conflict (shift 8, reduce 18) on INT
+131: shift/reduce conflict (shift 9, reduce 18) on STRING
+131: shift/reduce conflict (shift 10, reduce 18) on FLOAT
+131: shift/reduce conflict (shift 11, reduce 18) on VOID
+131: shift/reduce conflict (shift 12, reduce 18) on ID
+state 131
+	fprogram : fprogram . fstat  (3)
+	function_def : type ID LB argument RB LCB fprogram . RCB  (36)
+	function_def : type ID LB argument RB LCB fprogram . return RCB  (37)
+	fstat : .  (18)
+
+	PRINT  shift 118
+	IF  shift 2
+	WHILE  shift 3
+	LB  shift 4
+	RCB  shift 139
+	RET  shift 140
+	I_CONST  shift 5
+	F_CONST  shift 6
+	BOOL  shift 7
+	INT  shift 8
+	STRING  shift 9
+	FLOAT  shift 10
+	VOID  shift 11
+	ID  shift 12
+
+	type  goto 120
+	func_id  goto 121
+	id  goto 15
+	fstat  goto 122
+	fdeclaration  goto 123
+	compound_stat  goto 124
+	print_func  goto 125
+	return  goto 141
+	if_stat  goto 21
+	while_stat  goto 22
+	direct_function_call  goto 126
+	function_call  goto 23
+	expression_stat4  goto 127
+	expr_asgn  goto 128
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 132
+	print_func : PRINT LB . ID RB SEMICOLON  (86)
+	print_func : PRINT LB . STR_CONST RB SEMICOLON  (87)
+
+	STR_CONST  shift 142
+	ID  shift 143
+	.  error
+
+
+state 133
+	else_stat : ELSE . LCB fprogram RCB  (59)
+	elseif_stat : ELSE . IF LB expression_stat4 RB LCB fprogram RCB else_stat  (60)
+	elseif_stat : ELSE . IF LB expression_stat4 RB LCB fprogram RCB elseif_stat  (61)
+
+	IF  shift 144
+	LCB  shift 145
+	.  error
+
+
+state 134
+	if_stat : IF LB expression_stat4 RB LCB fprogram RCB else_stat .  (57)
+
+	.  reduce 57
+
+
+state 135
+	if_stat : IF LB expression_stat4 RB LCB fprogram RCB elseif_stat .  (58)
+
+	.  reduce 58
+
+
+state 136
+	fdeclaration : type ID . SEMICOLON  (51)
+	fdeclaration : type ID . ASGN initializer SEMICOLON  (52)
+	fdeclaration : type ID . ASGN expression_stat4 SEMICOLON  (53)
+
+	SEMICOLON  shift 146
+	ASGN  shift 147
+	.  error
+
+
+state 137
+	direct_function_call : func_id LB . parameter RB SEMICOLON  (21)
+	function_call : func_id LB . parameter RB  (22)
+
+	LB  shift 4
+	I_CONST  shift 63
+	F_CONST  shift 64
+	STR_CONST  shift 65
+	ID  shift 12
+	.  error
+
+	func_id  goto 14
+	id  goto 66
+	function_call  goto 23
+	parameter  goto 148
+	pass  goto 68
+	expression_stat4  goto 69
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+	initializer  goto 70
+
+
+state 138
+	fstat : expression_stat4 semicolon .  (15)
+
+	.  reduce 15
+
+
+state 139
+	function_def : type ID LB argument RB LCB fprogram RCB .  (36)
+
+	.  reduce 36
+
+
+state 140
+	return : RET . SEMICOLON  (38)
+	return : RET . TRUE SEMICOLON  (39)
+	return : RET . FALSE SEMICOLON  (40)
+	return : RET . I_CONST SEMICOLON  (41)
+	return : RET . F_CONST SEMICOLON  (42)
+	return : RET . expression_stat4 SEMICOLON  (43)
+	return : RET . STR_CONST SEMICOLON  (44)
+
+	SEMICOLON  shift 149
+	LB  shift 4
+	TRUE  shift 150
+	FALSE  shift 151
+	I_CONST  shift 152
+	F_CONST  shift 153
+	STR_CONST  shift 154
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 155
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 141
+	function_def : type ID LB argument RB LCB fprogram return . RCB  (37)
+
+	RCB  shift 156
+	.  error
+
+
+state 142
+	print_func : PRINT LB STR_CONST . RB SEMICOLON  (87)
+
+	RB  shift 157
+	.  error
+
+
+state 143
+	print_func : PRINT LB ID . RB SEMICOLON  (86)
+
+	RB  shift 158
+	.  error
+
+
+state 144
+	elseif_stat : ELSE IF . LB expression_stat4 RB LCB fprogram RCB else_stat  (60)
+	elseif_stat : ELSE IF . LB expression_stat4 RB LCB fprogram RCB elseif_stat  (61)
+
+	LB  shift 159
+	.  error
+
+
+state 145
+	else_stat : ELSE LCB . fprogram RCB  (59)
+	fprogram : .  (4)
+
+	.  reduce 4
+
+	fprogram  goto 160
+
+
+state 146
+	fdeclaration : type ID SEMICOLON .  (51)
+
+	.  reduce 51
+
+
+state 147
+	fdeclaration : type ID ASGN . initializer SEMICOLON  (52)
+	fdeclaration : type ID ASGN . expression_stat4 SEMICOLON  (53)
+
+	LB  shift 4
+	I_CONST  shift 63
+	F_CONST  shift 64
+	STR_CONST  shift 65
+	ID  shift 32
+	.  error
+
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 161
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+	initializer  goto 162
+
+
+state 148
+	direct_function_call : func_id LB parameter . RB SEMICOLON  (21)
+	function_call : func_id LB parameter . RB  (22)
+	parameter : parameter . COMMA pass  (25)
+
+	COMMA  shift 94
+	RB  shift 163
+	.  error
+
+
+state 149
+	return : RET SEMICOLON .  (38)
+
+	.  reduce 38
+
+
+state 150
+	return : RET TRUE . SEMICOLON  (39)
+
+	SEMICOLON  shift 164
+	.  error
+
+
+state 151
+	return : RET FALSE . SEMICOLON  (40)
+
+	SEMICOLON  shift 165
+	.  error
+
+
+152: shift/reduce conflict (shift 166, reduce 82) on SEMICOLON
+state 152
+	return : RET I_CONST . SEMICOLON  (41)
+	factor : I_CONST .  (82)
+
+	SEMICOLON  shift 166
+	ADD  reduce 82
+	SUB  reduce 82
+	MUL  reduce 82
+	DIV  reduce 82
+	MOD  reduce 82
+	INC  reduce 82
+	DEC  reduce 82
+	MT  reduce 82
+	LT  reduce 82
+	MTE  reduce 82
+	LTE  reduce 82
+	EQ  reduce 82
+	NE  reduce 82
+
+
+153: shift/reduce conflict (shift 167, reduce 83) on SEMICOLON
+state 153
+	return : RET F_CONST . SEMICOLON  (42)
+	factor : F_CONST .  (83)
+
+	SEMICOLON  shift 167
 	ADD  reduce 83
 	SUB  reduce 83
 	MUL  reduce 83
@@ -1758,702 +2328,96 @@ state 104
 	LTE  reduce 83
 	EQ  reduce 83
 	NE  reduce 83
-	WHILE  reduce 83
-	RCB  reduce 83
-	RET  reduce 83
-	I_CONST  reduce 83
-	F_CONST  reduce 83
-	BOOL  reduce 83
-	INT  reduce 83
-	STRING  reduce 83
-	FLOAT  reduce 83
-	VOID  reduce 83
-	ID  reduce 83
-
-
-state 105
-	fdeclaration : type . ID SEMICOLON NEWLINE  (56)
-	fdeclaration : type . ID ASGN initializer SEMICOLON NEWLINE  (57)
-	fdeclaration : type . ID ASGN expression_stat4 SEMICOLON NEWLINE  (58)
-
-	ID  shift 121
-	.  error
-
-
-106: shift/reduce conflict (shift 122, reduce 4) on NEWLINE
-state 106
-	fprogram : fprogram fstat .  (4)
-	fprogram : fprogram fstat . NEWLINE  (5)
-
-	NEWLINE  shift 122
-	PRINT  reduce 4
-	IF  reduce 4
-	WHILE  reduce 4
-	LB  reduce 4
-	RCB  reduce 4
-	RET  reduce 4
-	I_CONST  reduce 4
-	F_CONST  reduce 4
-	BOOL  reduce 4
-	INT  reduce 4
-	STRING  reduce 4
-	FLOAT  reduce 4
-	VOID  reduce 4
-	ID  reduce 4
-
-
-state 107
-	fstat : fdeclaration .  (16)
-
-	.  reduce 16
-
-
-state 108
-	fstat : compound_stat .  (17)
-
-	.  reduce 17
-
-
-state 109
-	fstat : print_func .  (21)
-
-	.  reduce 21
-
-
-state 110
-	fstat : function_call .  (20)
-
-	.  reduce 20
-
-
-state 111
-	fstat : expression_stat4 . semicolon  (19)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-	semicolon : .  (24)
-
-	SEMICOLON  shift 39
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	PRINT  reduce 24
-	IF  reduce 24
-	NEWLINE  reduce 24
-	WHILE  reduce 24
-	LB  reduce 24
-	RCB  reduce 24
-	RET  reduce 24
-	I_CONST  reduce 24
-	F_CONST  reduce 24
-	BOOL  reduce 24
-	INT  reduce 24
-	STRING  reduce 24
-	FLOAT  reduce 24
-	VOID  reduce 24
-	ID  reduce 24
-
-	semicolon  goto 123
-
-
-state 112
-	fstat : expr_asgn . SEMICOLON  (18)
-
-	SEMICOLON  shift 124
-	.  error
-
-
-state 113
-	while_stat : WHILE LB expression_stat4 RB LCB fprogram RCB .  (64)
-
-	.  reduce 64
-
-
-state 114
-	argument : argument COMMA type ID .  (51)
-
-	.  reduce 51
-
-
-state 115
-	function_decl : type ID LB argument RB SEMICOLON NEWLINE .  (37)
-
-	.  reduce 37
-
-
-state 116
-	function_def : type ID LB argument RB LCB NEWLINE . fprogram return NEWLINE RCB NEWLINE  (39)
-	fprogram : .  (6)
-
-	.  reduce 6
-
-	fprogram  goto 125
-
-
-117: shift/reduce conflict (shift 102, reduce 22) on PRINT
-117: shift/reduce conflict (shift 2, reduce 22) on IF
-117: shift/reduce conflict (shift 3, reduce 22) on WHILE
-117: shift/reduce conflict (shift 4, reduce 22) on LB
-117: shift/reduce conflict (shift 126, reduce 22) on RCB
-117: shift/reduce conflict (shift 5, reduce 22) on I_CONST
-117: shift/reduce conflict (shift 6, reduce 22) on F_CONST
-117: shift/reduce conflict (shift 7, reduce 22) on BOOL
-117: shift/reduce conflict (shift 8, reduce 22) on INT
-117: shift/reduce conflict (shift 9, reduce 22) on STRING
-117: shift/reduce conflict (shift 10, reduce 22) on FLOAT
-117: shift/reduce conflict (shift 11, reduce 22) on VOID
-117: shift/reduce conflict (shift 104, reduce 22) on ID
-state 117
-	fprogram : fprogram . fstat  (4)
-	fprogram : fprogram . fstat NEWLINE  (5)
-	function_def : type ID LB argument RB LCB fprogram . RCB  (38)
-	fstat : .  (22)
-
-	PRINT  shift 102
-	IF  shift 2
-	WHILE  shift 3
-	LB  shift 4
-	RCB  shift 126
-	I_CONST  shift 5
-	F_CONST  shift 6
-	BOOL  shift 7
-	INT  shift 8
-	STRING  shift 9
-	FLOAT  shift 10
-	VOID  shift 11
-	ID  shift 104
-	NEWLINE  reduce 22
-
-	type  goto 105
-	fstat  goto 106
-	fdeclaration  goto 107
-	compound_stat  goto 108
-	print_func  goto 109
-	if_stat  goto 19
-	while_stat  goto 20
-	function_call  goto 110
-	expression_stat4  goto 111
-	expr_asgn  goto 112
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 118
-	print_func : PRINT LB . ID RB SEMICOLON NEWLINE  (86)
-	print_func : PRINT LB . STR_CONST RB SEMICOLON NEWLINE  (87)
-
-	STR_CONST  shift 127
-	ID  shift 128
-	.  error
-
-
-state 119
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE . if_stat  (62)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE . new_line LCB new_line fprogram RCB  (63)
-	new_line : .  (8)
-
-	IF  shift 2
-	NEWLINE  reduce 8
-	LCB  reduce 8
-
-	if_stat  goto 129
-	new_line  goto 130
-
-
-state 120
-	function_call : ID LB . parameter RB SEMICOLON NEWLINE  (25)
-	parameter : .  (28)
-
-	I_CONST  shift 131
-	F_CONST  shift 132
-	STR_CONST  shift 83
-	ID  shift 133
-	COMMA  reduce 28
-	RB  reduce 28
-
-	parameter  goto 134
-	pass  goto 135
-	initializer  goto 136
-
-
-state 121
-	fdeclaration : type ID . SEMICOLON NEWLINE  (56)
-	fdeclaration : type ID . ASGN initializer SEMICOLON NEWLINE  (57)
-	fdeclaration : type ID . ASGN expression_stat4 SEMICOLON NEWLINE  (58)
-
-	SEMICOLON  shift 137
-	ASGN  shift 138
-	.  error
-
-
-state 122
-	fprogram : fprogram fstat NEWLINE .  (5)
-
-	.  reduce 5
-
-
-state 123
-	fstat : expression_stat4 semicolon .  (19)
-
-	.  reduce 19
-
-
-state 124
-	fstat : expr_asgn SEMICOLON .  (18)
-
-	.  reduce 18
-
-
-125: shift/reduce conflict (shift 102, reduce 22) on PRINT
-125: shift/reduce conflict (shift 2, reduce 22) on IF
-125: shift/reduce conflict (shift 3, reduce 22) on WHILE
-125: shift/reduce conflict (shift 4, reduce 22) on LB
-125: shift/reduce conflict (shift 139, reduce 22) on RET
-125: shift/reduce conflict (shift 5, reduce 22) on I_CONST
-125: shift/reduce conflict (shift 6, reduce 22) on F_CONST
-125: shift/reduce conflict (shift 7, reduce 22) on BOOL
-125: shift/reduce conflict (shift 8, reduce 22) on INT
-125: shift/reduce conflict (shift 9, reduce 22) on STRING
-125: shift/reduce conflict (shift 10, reduce 22) on FLOAT
-125: shift/reduce conflict (shift 11, reduce 22) on VOID
-125: shift/reduce conflict (shift 104, reduce 22) on ID
-state 125
-	fprogram : fprogram . fstat  (4)
-	fprogram : fprogram . fstat NEWLINE  (5)
-	function_def : type ID LB argument RB LCB NEWLINE fprogram . return NEWLINE RCB NEWLINE  (39)
-	fstat : .  (22)
-
-	PRINT  shift 102
-	IF  shift 2
-	WHILE  shift 3
-	LB  shift 4
-	RET  shift 139
-	I_CONST  shift 5
-	F_CONST  shift 6
-	BOOL  shift 7
-	INT  shift 8
-	STRING  shift 9
-	FLOAT  shift 10
-	VOID  shift 11
-	ID  shift 104
-	NEWLINE  reduce 22
-
-	type  goto 105
-	fstat  goto 106
-	fdeclaration  goto 107
-	compound_stat  goto 108
-	print_func  goto 109
-	return  goto 140
-	if_stat  goto 19
-	while_stat  goto 20
-	function_call  goto 110
-	expression_stat4  goto 111
-	expr_asgn  goto 112
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 126
-	function_def : type ID LB argument RB LCB fprogram RCB .  (38)
-
-	.  reduce 38
-
-
-state 127
-	print_func : PRINT LB STR_CONST . RB SEMICOLON NEWLINE  (87)
-
-	RB  shift 141
-	.  error
-
-
-state 128
-	print_func : PRINT LB ID . RB SEMICOLON NEWLINE  (86)
-
-	RB  shift 142
-	.  error
-
-
-state 129
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE if_stat .  (62)
-
-	.  reduce 62
-
-
-state 130
-	new_line : new_line . NEWLINE  (7)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line . LCB new_line fprogram RCB  (63)
-
-	NEWLINE  shift 143
-	LCB  shift 144
-	.  error
-
-
-state 131
-	initializer : I_CONST .  (88)
-
-	.  reduce 88
-
-
-state 132
-	initializer : F_CONST .  (89)
-
-	.  reduce 89
-
-
-state 133
-	pass : ID .  (29)
-
-	.  reduce 29
-
-
-state 134
-	function_call : ID LB parameter . RB SEMICOLON NEWLINE  (25)
-	parameter : parameter . COMMA pass  (27)
-
-	COMMA  shift 145
-	RB  shift 146
-	.  error
-
-
-state 135
-	parameter : pass .  (26)
-
-	.  reduce 26
-
-
-state 136
-	pass : initializer .  (30)
-
-	.  reduce 30
-
-
-state 137
-	fdeclaration : type ID SEMICOLON . NEWLINE  (56)
-
-	NEWLINE  shift 147
-	.  error
-
-
-state 138
-	fdeclaration : type ID ASGN . initializer SEMICOLON NEWLINE  (57)
-	fdeclaration : type ID ASGN . expression_stat4 SEMICOLON NEWLINE  (58)
-
-	LB  shift 4
-	I_CONST  shift 81
-	F_CONST  shift 82
-	STR_CONST  shift 83
-	ID  shift 29
-	.  error
-
-	expression_stat4  goto 148
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-	initializer  goto 149
-
-
-state 139
-	return : RET . SEMICOLON  (40)
-	return : RET . TRUE SEMICOLON  (41)
-	return : RET . FALSE SEMICOLON  (42)
-	return : RET . I_CONST SEMICOLON  (43)
-	return : RET . F_CONST SEMICOLON  (44)
-	return : RET . STR_CONST SEMICOLON  (45)
-
-	SEMICOLON  shift 150
-	TRUE  shift 151
-	FALSE  shift 152
-	I_CONST  shift 153
-	F_CONST  shift 154
-	STR_CONST  shift 155
-	.  error
-
-
-state 140
-	function_def : type ID LB argument RB LCB NEWLINE fprogram return . NEWLINE RCB NEWLINE  (39)
-
-	NEWLINE  shift 156
-	.  error
-
-
-state 141
-	print_func : PRINT LB STR_CONST RB . SEMICOLON NEWLINE  (87)
-
-	SEMICOLON  shift 157
-	.  error
-
-
-state 142
-	print_func : PRINT LB ID RB . SEMICOLON NEWLINE  (86)
-
-	SEMICOLON  shift 158
-	.  error
-
-
-state 143
-	new_line : new_line NEWLINE .  (7)
-
-	.  reduce 7
-
-
-state 144
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB . new_line fprogram RCB  (63)
-	new_line : .  (8)
-
-	.  reduce 8
-
-	new_line  goto 159
-
-
-state 145
-	parameter : parameter COMMA . pass  (27)
-
-	I_CONST  shift 131
-	F_CONST  shift 132
-	STR_CONST  shift 83
-	ID  shift 133
-	.  error
-
-	pass  goto 160
-	initializer  goto 136
-
-
-state 146
-	function_call : ID LB parameter RB . SEMICOLON NEWLINE  (25)
-
-	SEMICOLON  shift 161
-	.  error
-
-
-state 147
-	fdeclaration : type ID SEMICOLON NEWLINE .  (56)
-
-	.  reduce 56
-
-
-state 148
-	fdeclaration : type ID ASGN expression_stat4 . SEMICOLON NEWLINE  (58)
-	expression_stat4 : expression_stat4 . EQ expression_stat3  (65)
-	expression_stat4 : expression_stat4 . MTE expression_stat3  (66)
-	expression_stat4 : expression_stat4 . LTE expression_stat3  (67)
-	expression_stat4 : expression_stat4 . NE expression_stat3  (68)
-	expression_stat4 : expression_stat4 . MT expression_stat3  (69)
-	expression_stat4 : expression_stat4 . LT expression_stat3  (70)
-
-	SEMICOLON  shift 162
-	MT  shift 40
-	LT  shift 41
-	MTE  shift 42
-	LTE  shift 43
-	EQ  shift 44
-	NE  shift 45
-	.  error
-
-
-state 149
-	fdeclaration : type ID ASGN initializer . SEMICOLON NEWLINE  (57)
-
-	SEMICOLON  shift 163
-	.  error
-
-
-state 150
-	return : RET SEMICOLON .  (40)
-
-	.  reduce 40
-
-
-state 151
-	return : RET TRUE . SEMICOLON  (41)
-
-	SEMICOLON  shift 164
-	.  error
-
-
-state 152
-	return : RET FALSE . SEMICOLON  (42)
-
-	SEMICOLON  shift 165
-	.  error
-
-
-state 153
-	return : RET I_CONST . SEMICOLON  (43)
-
-	SEMICOLON  shift 166
-	.  error
 
 
 state 154
-	return : RET F_CONST . SEMICOLON  (44)
-
-	SEMICOLON  shift 167
-	.  error
-
-
-state 155
-	return : RET STR_CONST . SEMICOLON  (45)
+	return : RET STR_CONST . SEMICOLON  (44)
 
 	SEMICOLON  shift 168
 	.  error
 
 
-state 156
-	function_def : type ID LB argument RB LCB NEWLINE fprogram return NEWLINE . RCB NEWLINE  (39)
+state 155
+	return : RET expression_stat4 . SEMICOLON  (43)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
 
-	RCB  shift 169
+	SEMICOLON  shift 169
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
 	.  error
 
 
-state 157
-	print_func : PRINT LB STR_CONST RB SEMICOLON . NEWLINE  (87)
+state 156
+	function_def : type ID LB argument RB LCB fprogram return RCB .  (37)
 
-	NEWLINE  shift 170
+	.  reduce 37
+
+
+state 157
+	print_func : PRINT LB STR_CONST RB . SEMICOLON  (87)
+
+	SEMICOLON  shift 170
 	.  error
 
 
 state 158
-	print_func : PRINT LB ID RB SEMICOLON . NEWLINE  (86)
+	print_func : PRINT LB ID RB . SEMICOLON  (86)
 
-	NEWLINE  shift 171
+	SEMICOLON  shift 171
 	.  error
 
 
-159: shift/reduce conflict (shift 143, reduce 6) on NEWLINE
 state 159
-	new_line : new_line . NEWLINE  (7)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line . fprogram RCB  (63)
-	fprogram : .  (6)
+	elseif_stat : ELSE IF LB . expression_stat4 RB LCB fprogram RCB else_stat  (60)
+	elseif_stat : ELSE IF LB . expression_stat4 RB LCB fprogram RCB elseif_stat  (61)
 
-	NEWLINE  shift 143
-	PRINT  reduce 6
-	IF  reduce 6
-	WHILE  reduce 6
-	LB  reduce 6
-	RCB  reduce 6
-	I_CONST  reduce 6
-	F_CONST  reduce 6
-	BOOL  reduce 6
-	INT  reduce 6
-	STRING  reduce 6
-	FLOAT  reduce 6
-	VOID  reduce 6
-	ID  reduce 6
+	LB  shift 4
+	I_CONST  shift 5
+	F_CONST  shift 6
+	ID  shift 32
+	.  error
 
-	fprogram  goto 172
+	func_id  goto 14
+	function_call  goto 23
+	expression_stat4  goto 172
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
+160: shift/reduce conflict (shift 118, reduce 18) on PRINT
+160: shift/reduce conflict (shift 2, reduce 18) on IF
+160: shift/reduce conflict (shift 3, reduce 18) on WHILE
+160: shift/reduce conflict (shift 4, reduce 18) on LB
+160: shift/reduce conflict (shift 173, reduce 18) on RCB
+160: shift/reduce conflict (shift 5, reduce 18) on I_CONST
+160: shift/reduce conflict (shift 6, reduce 18) on F_CONST
+160: shift/reduce conflict (shift 7, reduce 18) on BOOL
+160: shift/reduce conflict (shift 8, reduce 18) on INT
+160: shift/reduce conflict (shift 9, reduce 18) on STRING
+160: shift/reduce conflict (shift 10, reduce 18) on FLOAT
+160: shift/reduce conflict (shift 11, reduce 18) on VOID
+160: shift/reduce conflict (shift 12, reduce 18) on ID
 state 160
-	parameter : parameter COMMA pass .  (27)
+	fprogram : fprogram . fstat  (3)
+	else_stat : ELSE LCB fprogram . RCB  (59)
+	fstat : .  (18)
 
-	.  reduce 27
-
-
-state 161
-	function_call : ID LB parameter RB SEMICOLON . NEWLINE  (25)
-
-	NEWLINE  shift 173
-	.  error
-
-
-state 162
-	fdeclaration : type ID ASGN expression_stat4 SEMICOLON . NEWLINE  (58)
-
-	NEWLINE  shift 174
-	.  error
-
-
-state 163
-	fdeclaration : type ID ASGN initializer SEMICOLON . NEWLINE  (57)
-
-	NEWLINE  shift 175
-	.  error
-
-
-state 164
-	return : RET TRUE SEMICOLON .  (41)
-
-	.  reduce 41
-
-
-state 165
-	return : RET FALSE SEMICOLON .  (42)
-
-	.  reduce 42
-
-
-state 166
-	return : RET I_CONST SEMICOLON .  (43)
-
-	.  reduce 43
-
-
-state 167
-	return : RET F_CONST SEMICOLON .  (44)
-
-	.  reduce 44
-
-
-state 168
-	return : RET STR_CONST SEMICOLON .  (45)
-
-	.  reduce 45
-
-
-state 169
-	function_def : type ID LB argument RB LCB NEWLINE fprogram return NEWLINE RCB . NEWLINE  (39)
-
-	NEWLINE  shift 176
-	.  error
-
-
-state 170
-	print_func : PRINT LB STR_CONST RB SEMICOLON NEWLINE .  (87)
-
-	.  reduce 87
-
-
-state 171
-	print_func : PRINT LB ID RB SEMICOLON NEWLINE .  (86)
-
-	.  reduce 86
-
-
-172: shift/reduce conflict (shift 102, reduce 22) on PRINT
-172: shift/reduce conflict (shift 2, reduce 22) on IF
-172: shift/reduce conflict (shift 3, reduce 22) on WHILE
-172: shift/reduce conflict (shift 4, reduce 22) on LB
-172: shift/reduce conflict (shift 177, reduce 22) on RCB
-172: shift/reduce conflict (shift 5, reduce 22) on I_CONST
-172: shift/reduce conflict (shift 6, reduce 22) on F_CONST
-172: shift/reduce conflict (shift 7, reduce 22) on BOOL
-172: shift/reduce conflict (shift 8, reduce 22) on INT
-172: shift/reduce conflict (shift 9, reduce 22) on STRING
-172: shift/reduce conflict (shift 10, reduce 22) on FLOAT
-172: shift/reduce conflict (shift 11, reduce 22) on VOID
-172: shift/reduce conflict (shift 104, reduce 22) on ID
-state 172
-	fprogram : fprogram . fstat  (4)
-	fprogram : fprogram . fstat NEWLINE  (5)
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line fprogram . RCB  (63)
-	fstat : .  (22)
-
-	PRINT  shift 102
+	PRINT  shift 118
 	IF  shift 2
 	WHILE  shift 3
 	LB  shift 4
-	RCB  shift 177
+	RCB  shift 173
 	I_CONST  shift 5
 	F_CONST  shift 6
 	BOOL  shift 7
@@ -2461,76 +2425,291 @@ state 172
 	STRING  shift 9
 	FLOAT  shift 10
 	VOID  shift 11
-	ID  shift 104
-	NEWLINE  reduce 22
+	ID  shift 12
 
-	type  goto 105
-	fstat  goto 106
-	fdeclaration  goto 107
-	compound_stat  goto 108
-	print_func  goto 109
-	if_stat  goto 19
-	while_stat  goto 20
-	function_call  goto 110
-	expression_stat4  goto 111
-	expr_asgn  goto 112
-	expression_stat3  goto 23
-	expression_stat2  goto 24
-	expression_stat1  goto 25
-	factor  goto 26
-
-
-state 173
-	function_call : ID LB parameter RB SEMICOLON NEWLINE .  (25)
-
-	.  reduce 25
+	type  goto 120
+	func_id  goto 121
+	id  goto 15
+	fstat  goto 122
+	fdeclaration  goto 123
+	compound_stat  goto 124
+	print_func  goto 125
+	if_stat  goto 21
+	while_stat  goto 22
+	direct_function_call  goto 126
+	function_call  goto 23
+	expression_stat4  goto 127
+	expr_asgn  goto 128
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
 
 
-state 174
-	fdeclaration : type ID ASGN expression_stat4 SEMICOLON NEWLINE .  (58)
+state 161
+	fdeclaration : type ID ASGN expression_stat4 . SEMICOLON  (53)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
 
-	.  reduce 58
+	SEMICOLON  shift 174
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	.  error
 
 
-state 175
-	fdeclaration : type ID ASGN initializer SEMICOLON NEWLINE .  (57)
+state 162
+	fdeclaration : type ID ASGN initializer . SEMICOLON  (52)
 
-	.  reduce 57
+	SEMICOLON  shift 175
+	.  error
 
 
-state 176
-	function_def : type ID LB argument RB LCB NEWLINE fprogram return NEWLINE RCB NEWLINE .  (39)
+163: shift/reduce conflict (shift 176, reduce 22) on SEMICOLON
+state 163
+	direct_function_call : func_id LB parameter RB . SEMICOLON  (21)
+	function_call : func_id LB parameter RB .  (22)
+
+	SEMICOLON  shift 176
+	PRINT  reduce 22
+	IF  reduce 22
+	ADD  reduce 22
+	SUB  reduce 22
+	MUL  reduce 22
+	DIV  reduce 22
+	MOD  reduce 22
+	INC  reduce 22
+	DEC  reduce 22
+	MT  reduce 22
+	LT  reduce 22
+	MTE  reduce 22
+	LTE  reduce 22
+	EQ  reduce 22
+	NE  reduce 22
+	WHILE  reduce 22
+	LB  reduce 22
+	RCB  reduce 22
+	RET  reduce 22
+	I_CONST  reduce 22
+	F_CONST  reduce 22
+	BOOL  reduce 22
+	INT  reduce 22
+	STRING  reduce 22
+	FLOAT  reduce 22
+	VOID  reduce 22
+	ID  reduce 22
+
+
+state 164
+	return : RET TRUE SEMICOLON .  (39)
 
 	.  reduce 39
 
 
-state 177
-	if_stat : IF LB expression_stat4 RB LCB fprogram RCB ELSE new_line LCB new_line fprogram RCB .  (63)
+state 165
+	return : RET FALSE SEMICOLON .  (40)
 
-	.  reduce 63
+	.  reduce 40
+
+
+state 166
+	return : RET I_CONST SEMICOLON .  (41)
+
+	.  reduce 41
+
+
+state 167
+	return : RET F_CONST SEMICOLON .  (42)
+
+	.  reduce 42
+
+
+state 168
+	return : RET STR_CONST SEMICOLON .  (44)
+
+	.  reduce 44
+
+
+state 169
+	return : RET expression_stat4 SEMICOLON .  (43)
+
+	.  reduce 43
+
+
+state 170
+	print_func : PRINT LB STR_CONST RB SEMICOLON .  (87)
+
+	.  reduce 87
+
+
+state 171
+	print_func : PRINT LB ID RB SEMICOLON .  (86)
+
+	.  reduce 86
+
+
+state 172
+	elseif_stat : ELSE IF LB expression_stat4 . RB LCB fprogram RCB else_stat  (60)
+	elseif_stat : ELSE IF LB expression_stat4 . RB LCB fprogram RCB elseif_stat  (61)
+	expression_stat4 : expression_stat4 . EQ expression_stat3  (63)
+	expression_stat4 : expression_stat4 . MTE expression_stat3  (64)
+	expression_stat4 : expression_stat4 . LTE expression_stat3  (65)
+	expression_stat4 : expression_stat4 . NE expression_stat3  (66)
+	expression_stat4 : expression_stat4 . MT expression_stat3  (67)
+	expression_stat4 : expression_stat4 . LT expression_stat3  (68)
+
+	MT  shift 43
+	LT  shift 44
+	MTE  shift 45
+	LTE  shift 46
+	EQ  shift 47
+	NE  shift 48
+	RB  shift 177
+	.  error
+
+
+state 173
+	else_stat : ELSE LCB fprogram RCB .  (59)
+
+	.  reduce 59
+
+
+state 174
+	fdeclaration : type ID ASGN expression_stat4 SEMICOLON .  (53)
+
+	.  reduce 53
+
+
+state 175
+	fdeclaration : type ID ASGN initializer SEMICOLON .  (52)
+
+	.  reduce 52
+
+
+state 176
+	direct_function_call : func_id LB parameter RB SEMICOLON .  (21)
+
+	.  reduce 21
+
+
+state 177
+	elseif_stat : ELSE IF LB expression_stat4 RB . LCB fprogram RCB else_stat  (60)
+	elseif_stat : ELSE IF LB expression_stat4 RB . LCB fprogram RCB elseif_stat  (61)
+
+	LCB  shift 178
+	.  error
+
+
+state 178
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB . fprogram RCB else_stat  (60)
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB . fprogram RCB elseif_stat  (61)
+	fprogram : .  (4)
+
+	.  reduce 4
+
+	fprogram  goto 179
+
+
+179: shift/reduce conflict (shift 118, reduce 18) on PRINT
+179: shift/reduce conflict (shift 2, reduce 18) on IF
+179: shift/reduce conflict (shift 3, reduce 18) on WHILE
+179: shift/reduce conflict (shift 4, reduce 18) on LB
+179: shift/reduce conflict (shift 180, reduce 18) on RCB
+179: shift/reduce conflict (shift 5, reduce 18) on I_CONST
+179: shift/reduce conflict (shift 6, reduce 18) on F_CONST
+179: shift/reduce conflict (shift 7, reduce 18) on BOOL
+179: shift/reduce conflict (shift 8, reduce 18) on INT
+179: shift/reduce conflict (shift 9, reduce 18) on STRING
+179: shift/reduce conflict (shift 10, reduce 18) on FLOAT
+179: shift/reduce conflict (shift 11, reduce 18) on VOID
+179: shift/reduce conflict (shift 12, reduce 18) on ID
+state 179
+	fprogram : fprogram . fstat  (3)
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram . RCB else_stat  (60)
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram . RCB elseif_stat  (61)
+	fstat : .  (18)
+
+	PRINT  shift 118
+	IF  shift 2
+	WHILE  shift 3
+	LB  shift 4
+	RCB  shift 180
+	I_CONST  shift 5
+	F_CONST  shift 6
+	BOOL  shift 7
+	INT  shift 8
+	STRING  shift 9
+	FLOAT  shift 10
+	VOID  shift 11
+	ID  shift 12
+
+	type  goto 120
+	func_id  goto 121
+	id  goto 15
+	fstat  goto 122
+	fdeclaration  goto 123
+	compound_stat  goto 124
+	print_func  goto 125
+	if_stat  goto 21
+	while_stat  goto 22
+	direct_function_call  goto 126
+	function_call  goto 23
+	expression_stat4  goto 127
+	expr_asgn  goto 128
+	expression_stat3  goto 26
+	expression_stat2  goto 27
+	expression_stat1  goto 28
+	factor  goto 29
+
+
+state 180
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram RCB . else_stat  (60)
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram RCB . elseif_stat  (61)
+
+	ELSE  shift 133
+	.  error
+
+	else_stat  goto 181
+	elseif_stat  goto 182
+
+
+state 181
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram RCB else_stat .  (60)
+
+	.  reduce 60
+
+
+state 182
+	elseif_stat : ELSE IF LB expression_stat4 RB LCB fprogram RCB elseif_stat .  (61)
+
+	.  reduce 61
 
 
 Rules never reduced:
-	nargument : type ID  (46)
-	nargument : nargument COMMA type ID  (47)
-	nargument :  (48)
-	fdecl_bottom : RB SEMICOLON NEWLINE  (49)
+	fstat :  (18)
 
 
 State 1 contains 11 shift/reduce conflicts.
-State 14 contains 1 shift/reduce conflict.
-State 81 contains 1 reduce/reduce conflict.
-State 82 contains 1 reduce/reduce conflict.
-State 95 contains 13 shift/reduce conflicts.
-State 96 contains 13 shift/reduce conflicts.
-State 101 contains 1 shift/reduce conflict.
-State 104 contains 1 shift/reduce conflict.
-State 106 contains 1 shift/reduce conflict.
-State 117 contains 13 shift/reduce conflicts.
-State 125 contains 13 shift/reduce conflicts.
-State 159 contains 1 shift/reduce conflict.
-State 172 contains 13 shift/reduce conflicts.
+State 12 contains 3 reduce/reduce conflicts.
+State 32 contains 1 reduce/reduce conflict.
+State 63 contains 3 reduce/reduce conflicts.
+State 64 contains 3 reduce/reduce conflicts.
+State 113 contains 13 shift/reduce conflicts.
+State 114 contains 13 shift/reduce conflicts.
+State 131 contains 14 shift/reduce conflicts.
+State 152 contains 1 shift/reduce conflict.
+State 153 contains 1 shift/reduce conflict.
+State 160 contains 13 shift/reduce conflicts.
+State 163 contains 1 shift/reduce conflict.
+State 179 contains 13 shift/reduce conflicts.
 
 
-54 terminals, 30 nonterminals
-96 grammar rules, 178 states
+54 terminals, 32 nonterminals
+96 grammar rules, 183 states
